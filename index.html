@@ -143,6 +143,73 @@ header h1 em { color: var(--s-accent); font-style: italic; transition: color 0.6
 .tb-btn-pantry  { background: var(--rust); color: white; }
 .tb-btn-pantry:hover { background: var(--bark); }
 
+/* Seasonal toggle */
+.season-toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: white;
+  border: 1px solid #c4b48a;
+  border-radius: 3px;
+  padding: 0.4rem 0.7rem;
+  white-space: nowrap;
+}
+.season-toggle-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bark);
+  user-select: none;
+  cursor: pointer;
+}
+.toggle-switch {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-track {
+  position: absolute;
+  inset: 0;
+  background: #ccc;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+.toggle-track::after {
+  content: '';
+  position: absolute;
+  left: 2px; top: 2px;
+  width: 16px; height: 16px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.25s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle-switch input:checked + .toggle-track { background: var(--moss); }
+.toggle-switch input:checked + .toggle-track::after { transform: translateX(16px); }
+
+/* Reshuffle button on card */
+.reshuffle-btn {
+  display: block;
+  width: 100%;
+  background: none;
+  border: 1px dashed var(--straw);
+  border-radius: 3px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sage);
+  padding: 0.4rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: border-color 0.2s, color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.reshuffle-btn:hover { border-color: var(--moss); color: var(--moss); }
+
 
 /* ═══════════════════════════════════════════════════════════
    MONTH NAV
@@ -808,6 +875,13 @@ footer {
   </div>
   <button class="tb-btn tb-btn-planner" id="plannerToggle">📅 Meal Planner</button>
   <button class="tb-btn tb-btn-pantry"  id="pantryBtn">🧑‍🍳 Chef's Pantry</button>
+  <label class="season-toggle-wrap" title="When on, meals that suit the current season are shown more often">
+    <span class="season-toggle-label">🌿 Seasonal meals</span>
+    <span class="toggle-switch">
+      <input type="checkbox" id="seasonToggle" checked>
+      <span class="toggle-track"></span>
+    </span>
+  </label>
 
 </div>
 
@@ -966,11 +1040,17 @@ const VEG = [
     note: 'The leek is the backbone of the northern winter kitchen. Hardy in frost, mild and sweet when slow-cooked.',
     storage: 'Up to 2–3 weeks in the fridge, stored unwashed and loosely wrapped in a damp cloth. Trim roots before storing.',
     grow: { sow: 'Feb–Mar (indoors)', plant: 'May–Jun (outdoors)', harvest: 'Oct–Mar', tip: 'Earth up stems as they grow to blanch more white stem. Northern growers should protect young plants from spring frosts with fleece.' },
-    meals: [
-      { icon:'🥣', name:'Leek & Potato Soup',      desc:'A northern classic. Slow-cook leeks in butter, add floury potatoes and stock, blend until silky.',   time:'30 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=leek+potato+soup' },
-      { icon:'🥧', name:'Leek & Cheese Tart',       desc:'Softened leeks in a shortcrust pastry case with mature cheddar and a cream & egg custard.',          time:'60 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=leek+cheese+tart' },
-      { icon:'🍗', name:'Cock-a-Leekie',            desc:'Traditional Scottish-influenced broth with chicken, leeks, barley and a handful of prunes.',          time:'90 min',  difficulty:'weekend', link:'https://www.bbcgoodfood.com/search?q=cock+a+leekie' },
-      { icon:'🥘', name:'Leek & Mushroom Risotto',  desc:'Northern twist on an Italian staple — leeks braised down into the rice base with wild mushrooms.',   time:'45 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=leek+mushroom+risotto' },
+    mealPool: [
+      { icon:'🥣', name:'Leek & Potato Soup', desc:'Slow-cook leeks in butter, add floury potatoes and stock, blend until silky.', time:'30 min', difficulty:'easy', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=leek+potato+soup' },
+      { icon:'🥧', name:'Leek & Cheese Tart', desc:'Softened leeks in a shortcrust pastry case with mature cheddar and a cream & egg custard.', time:'60 min', difficulty:'medium', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=leek+cheese+tart' },
+      { icon:'🍗', name:'Cock-a-Leekie', desc:'Traditional broth with chicken, leeks, barley and a handful of prunes.', time:'90 min', difficulty:'weekend', seasons:['winter'], link:'https://www.bbcgoodfood.com/search?q=cock+a+leekie' },
+      { icon:'🥘', name:'Leek & Mushroom Risotto', desc:'Leeks braised down into the rice base with wild mushrooms.', time:'45 min', difficulty:'medium', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=leek+mushroom+risotto' },
+      { icon:'🍝', name:'Leek & Bacon Pasta', desc:'Sliced leeks softened in butter with crispy bacon and a splash of cream tossed through tagliatelle.', time:'20 min', difficulty:'easy', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=leek+bacon+pasta' },
+      { icon:'🫕', name:'Leek & Lentil Soup', desc:'Earthy green lentils with slow-cooked leeks, thyme and a good northern stock.', time:'40 min', difficulty:'easy', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=leek+lentil+soup' },
+      { icon:'🥗', name:'Warm Leek Vinaigrette', desc:'Whole braised leeks dressed with grain mustard vinaigrette — a classic French bistro dish.', time:'25 min', difficulty:'easy', seasons:['spring','summer'], link:'https://www.bbcgoodfood.com/search?q=leeks+vinaigrette' },
+      { icon:'🧀', name:'Leek & Stilton Gratin', desc:'Blanched leeks baked in cream with crumbled Stilton and a golden breadcrumb crust.', time:'45 min', difficulty:'medium', seasons:['winter'], link:'https://www.bbcgoodfood.com/search?q=leek+stilton+gratin' },
+      { icon:'🥞', name:'Leek & Sweetcorn Fritters', desc:'Grated leek and sweetcorn bound in a light batter, fried until golden.', time:'20 min', difficulty:'easy', seasons:['summer','spring'], link:'https://www.bbcgoodfood.com/search?q=leek+fritters' },
+      { icon:'🍳', name:'Leek & Goat\'s Cheese Omelette', desc:'Softened leeks folded into a fluffy omelette with crumbled goat\'s cheese.', time:'15 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=leek+goats+cheese+omelette' },
     ]
   },
   {
@@ -979,11 +1059,17 @@ const VEG = [
     note: 'Frost-sweetened kale is a North England staple. Curly varieties grow happily in Yorkshire and Cumbria.',
     storage: '3–5 days in the fridge. Best eaten very fresh. Strip leaves from stems before storing in a damp bag.',
     grow: { sow: 'Mar–May', plant: 'May–Jun', harvest: 'Sep–Mar', tip: 'Extremely hardy — kale will stand through the harshest northern winters. Pick outer leaves first to keep the plant producing. Watch for cabbage white caterpillars.' },
-    meals: [
-      { icon:'🥣', name:'Kale & White Bean Soup',   desc:'Tuscan-style ribollita adapted for the North — kale, cannellini beans and crusty bread.',           time:'40 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=kale+white+bean+soup' },
-      { icon:'🍳', name:'Kale & Egg Hash',           desc:'Wilted kale with crispy potatoes, topped with fried eggs and a splash of hot sauce.',               time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=kale+egg+hash' },
-      { icon:'🥗', name:'Warm Kale & Grain Salad',  desc:'Massaged kale with pearl barley, roasted squash and a mustard dressing.',                           time:'35 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=warm+kale+grain+salad' },
-      { icon:'🥙', name:'Colcannon',                 desc:'Irish-inspired mash blended with wilted kale, butter and spring onions — winter comfort.',          time:'30 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=colcannon+kale' },
+    mealPool: [
+      { icon:'🥣', name:'Kale & White Bean Soup', desc:'Tuscan-style ribollita adapted for the North — kale, cannellini beans and crusty bread.', time:'40 min', difficulty:'easy', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=kale+white+bean+soup' },
+      { icon:'🍳', name:'Kale & Egg Hash', desc:'Wilted kale with crispy potatoes, topped with fried eggs and a splash of hot sauce.', time:'20 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=kale+egg+hash' },
+      { icon:'🥗', name:'Warm Kale & Grain Salad', desc:'Massaged kale with pearl barley, roasted squash and a mustard dressing.', time:'35 min', difficulty:'easy', seasons:['autumn','winter'], link:'https://www.bbcgoodfood.com/search?q=warm+kale+grain+salad' },
+      { icon:'🥙', name:'Colcannon', desc:'Irish-inspired mash blended with wilted kale, butter and spring onions — winter comfort.', time:'30 min', difficulty:'easy', seasons:['winter'], link:'https://www.bbcgoodfood.com/search?q=colcannon+kale' },
+      { icon:'🍝', name:'Kale & Sausage Pasta', desc:'Italian sausage crumbled with garlic, chilli and kale through rigatoni.', time:'25 min', difficulty:'easy', seasons:['autumn','winter'], link:'https://www.bbcgoodfood.com/search?q=kale+sausage+pasta' },
+      { icon:'🥘', name:'Kale & Chickpea Curry', desc:'Spiced chickpeas simmered with kale, tomatoes and coconut milk.', time:'35 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=kale+chickpea+curry' },
+      { icon:'🫕', name:'Kale & Chorizo Stew', desc:'Hearty Portuguese-style caldo verde with kale, chorizo and potato.', time:'40 min', difficulty:'easy', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=kale+chorizo+stew' },
+      { icon:'🥗', name:'Raw Kale Slaw', desc:'Massaged raw kale with apple, toasted seeds and a lemon tahini dressing.', time:'15 min', difficulty:'easy', seasons:['spring','summer'], link:'https://www.bbcgoodfood.com/search?q=kale+slaw' },
+      { icon:'🍕', name:'Kale & Ricotta Pizza', desc:'Thin-crust pizza with wilted kale, creamy ricotta and a drizzle of chilli oil.', time:'30 min', difficulty:'medium', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=kale+ricotta+pizza' },
+      { icon:'🥚', name:'Kale Shakshuka', desc:'Eggs poached in a spiced tomato and kale sauce — a hearty winter breakfast or brunch.', time:'25 min', difficulty:'easy', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=kale+shakshuka' },
     ]
   },
   {
@@ -992,11 +1078,17 @@ const VEG = [
     note: 'Frost makes parsnips sweeter — the first hard frost converts their starch to sugars. A northern roast essential.',
     storage: '3–4 weeks in a cool dark place or fridge. Remove leafy tops. Can be left in the ground until needed.',
     grow: { sow: 'Mar–Apr (direct sow)', plant: 'N/A — direct sow only', harvest: 'Oct–Mar', tip: 'Parsnips are slow to germinate. Sow thickly and be patient — 3–4 weeks is normal in northern soils. Leave in the ground and harvest after the first frost for maximum sweetness.' },
-    meals: [
-      { icon:'🍗', name:'Honey-Roasted Parsnips',       desc:'Tossed in honey and thyme, roasted until caramelised and deeply nutty.',                    time:'40 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=honey+roasted+parsnips' },
-      { icon:'🥣', name:'Curried Parsnip Soup',          desc:'Blended with onions, ginger, cumin and vegetable stock — a warming bowl for a grey day.',  time:'35 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=curried+parsnip+soup' },
-      { icon:'🥘', name:'Parsnip & Blue Cheese Gratin', desc:'Thinly sliced parsnips baked in cream with crumbled Yorkshire blue cheese.',                time:'75 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=parsnip+gratin' },
-      { icon:'🫕', name:'Lancashire Hotpot',             desc:'Add parsnips to the classic — layered with lamb, onions and topped with potato.',          time:'2 hrs',   difficulty:'weekend', link:'https://www.bbcgoodfood.com/search?q=lancashire+hotpot' },
+    mealPool: [
+      { icon:'🍗', name:'Honey-Roasted Parsnips', desc:'Tossed in honey and thyme, roasted until caramelised and deeply nutty.', time:'40 min', difficulty:'easy', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=honey+roasted+parsnips' },
+      { icon:'🥣', name:'Curried Parsnip Soup', desc:'Blended with onions, ginger, cumin and vegetable stock — a warming bowl for a grey day.', time:'35 min', difficulty:'easy', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=curried+parsnip+soup' },
+      { icon:'🥘', name:'Parsnip & Blue Cheese Gratin', desc:'Thinly sliced parsnips baked in cream with crumbled Yorkshire blue cheese.', time:'75 min', difficulty:'medium', seasons:['winter'], link:'https://www.bbcgoodfood.com/search?q=parsnip+gratin' },
+      { icon:'🫕', name:'Lancashire Hotpot', desc:'Add parsnips to the classic — layered with lamb, onions and topped with potato.', time:'2 hrs', difficulty:'weekend', seasons:['winter'], link:'https://www.bbcgoodfood.com/search?q=lancashire+hotpot' },
+      { icon:'🍛', name:'Parsnip & Apple Soup', desc:'A sweet, velvety soup with roasted parsnip, apple and a swirl of crème fraîche.', time:'40 min', difficulty:'easy', seasons:['autumn','winter'], link:'https://www.bbcgoodfood.com/search?q=parsnip+apple+soup' },
+      { icon:'🥔', name:'Parsnip Mash', desc:'Mashed with butter and nutmeg — sweeter and more interesting than potato alone.', time:'20 min', difficulty:'easy', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=parsnip+mash' },
+      { icon:'🥙', name:'Parsnip Fritters', desc:'Grated parsnip fritters with cumin and coriander, served with minted yoghurt.', time:'25 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=parsnip+fritters' },
+      { icon:'🍰', name:'Parsnip Cake', desc:'Like carrot cake but earthier — parsnip and walnut cake with cream cheese frosting.', time:'70 min', difficulty:'medium', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=parsnip+cake' },
+      { icon:'🫘', name:'Parsnip & Lentil Dahl', desc:'Roasted parsnip chunks stirred through a gently spiced red lentil dahl.', time:'40 min', difficulty:'easy', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=parsnip+lentil+dahl' },
+      { icon:'🥗', name:'Roasted Parsnip Salad', desc:'Caramelised parsnip with rocket, pomegranate, feta and a honey dressing.', time:'40 min', difficulty:'easy', seasons:['autumn'], link:'https://www.bbcgoodfood.com/search?q=roasted+parsnip+salad' },
     ]
   },
   {
@@ -1005,11 +1097,17 @@ const VEG = [
     note: 'Controversial but glorious when cooked right. A firm frost on the stalk sweetens them beautifully.',
     storage: '1 week in the fridge. If possible, keep on the stalk until needed — they stay fresher much longer this way.',
     grow: { sow: 'Feb–Mar (indoors)', plant: 'May', harvest: 'Oct–Feb', tip: 'Firm, compact soil gives firm, compact sprouts. Stake plants before winter as they can be toppled by northern gales. Net against pigeons — they love the young plants.' },
-    meals: [
-      { icon:'🥓', name:'Sprouts with Bacon & Chestnuts', desc:'Pan-fried in butter with crispy smoked bacon and roasted chestnuts — the festive classic.',  time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=brussels+sprouts+bacon+chestnuts' },
-      { icon:'🍳', name:'Bubble & Squeak Patties',        desc:'Leftover sprouts and mash fried into crispy patties — Boxing Day staple.',                   time:'15 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=bubble+squeak' },
-      { icon:'🥗', name:'Shredded Sprout Salad',          desc:'Raw sprouts finely sliced with apple, walnuts and a cider vinegar dressing.',                time:'15 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=shredded+brussels+sprout+salad' },
-      { icon:'🧀', name:'Cheesy Sprout Bake',             desc:'Blanched sprouts in a rich mornay sauce, topped with golden breadcrumbs.',                   time:'45 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=cheesy+brussel+sprout+bake' },
+    mealPool: [
+      { icon:'🥓', name:'Sprouts with Bacon & Chestnuts', desc:'Pan-fried in butter with crispy smoked bacon and roasted chestnuts — the festive classic.', time:'20 min', difficulty:'easy', seasons:['winter'], link:'https://www.bbcgoodfood.com/search?q=brussels+sprouts+bacon+chestnuts' },
+      { icon:'🍳', name:'Bubble & Squeak Patties', desc:'Leftover sprouts and mash fried into crispy patties — Boxing Day staple.', time:'15 min', difficulty:'easy', seasons:['winter'], link:'https://www.bbcgoodfood.com/search?q=bubble+squeak' },
+      { icon:'🥗', name:'Shredded Sprout Salad', desc:'Raw sprouts finely sliced with apple, walnuts and a cider vinegar dressing.', time:'15 min', difficulty:'easy', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=shredded+brussels+sprout+salad' },
+      { icon:'🧀', name:'Cheesy Sprout Bake', desc:'Blanched sprouts in a rich mornay sauce, topped with golden breadcrumbs.', time:'45 min', difficulty:'medium', seasons:['winter'], link:'https://www.bbcgoodfood.com/search?q=cheesy+brussel+sprout+bake' },
+      { icon:'🥘', name:'Sprout & Pancetta Hash', desc:'Halved sprouts roasted with pancetta, garlic and a splash of balsamic.', time:'30 min', difficulty:'easy', seasons:['winter'], link:'https://www.bbcgoodfood.com/search?q=brussels+sprout+pancetta+hash' },
+      { icon:'🍛', name:'Sprout & Coconut Curry', desc:'Halved sprouts in a fragrant Thai-inspired coconut and lemongrass curry.', time:'30 min', difficulty:'easy', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=brussels+sprout+curry' },
+      { icon:'🥙', name:'Sprout Tacos', desc:'Charred shredded sprouts in corn tortillas with pickled red onion and crema.', time:'20 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=brussels+sprout+tacos' },
+      { icon:'🍝', name:'Sprout & Walnut Pasta', desc:'Shredded sprouts with brown butter, toasted walnuts and Parmesan through rigatoni.', time:'20 min', difficulty:'easy', seasons:['winter'], link:'https://www.bbcgoodfood.com/search?q=brussels+sprout+pasta' },
+      { icon:'🥚', name:'Sprout Frittata', desc:'Shredded sprouts with eggs, cream and mature cheddar, cooked slowly on the hob.', time:'20 min', difficulty:'easy', seasons:['winter'], link:'https://www.bbcgoodfood.com/search?q=brussels+sprout+frittata' },
+      { icon:'🔥', name:'Charred Sprouts with Miso', desc:'Whole sprouts charred at high heat and tossed in a miso and sesame glaze.', time:'20 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=charred+brussels+sprouts+miso' },
     ]
   },
   {
@@ -1018,11 +1116,17 @@ const VEG = [
     note: 'One of the most eagerly awaited crops in the northern garden — tiny purple florets signal the end of winter.',
     storage: '2–3 days in the fridge. Eat as soon as possible — the florets lose their sweetness quickly after picking.',
     grow: { sow: 'Apr–May', plant: 'Jun–Jul', harvest: 'Feb–Apr', tip: 'Plant in late summer for the following spring harvest. An excellent crop for the North — it thrives in cool, wet conditions and stands through the winter without protection.' },
-    meals: [
-      { icon:'🍝', name:'PSB with Pasta & Anchovy',  desc:'Blanched PSB tossed with spaghetti, anchovy-chilli butter and toasted breadcrumbs.',         time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=purple+sprouting+broccoli+pasta' },
-      { icon:'🥚', name:'PSB with Soft-boiled Eggs', desc:'Simple and elegant — steamed PSB with runny eggs and lemony yoghurt sauce.',                  time:'15 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=purple+sprouting+broccoli+eggs' },
-      { icon:'🫕', name:'PSB & Stilton Tart',        desc:'Tender PSB in a quiche-style tart with crumbled Stilton and caramelised onions.',             time:'70 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=purple+sprouting+broccoli+tart' },
-      { icon:'🥘', name:'PSB Stir-fry',              desc:'Quick-fried with garlic, ginger, soy and a drizzle of sesame oil.',                          time:'10 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=purple+sprouting+broccoli+stir+fry' },
+    mealPool: [
+      { icon:'🍝', name:'PSB with Pasta & Anchovy', desc:'Blanched PSB tossed with spaghetti, anchovy-chilli butter and toasted breadcrumbs.', time:'20 min', difficulty:'easy', seasons:['spring'], link:'https://www.bbcgoodfood.com/search?q=purple+sprouting+broccoli+pasta' },
+      { icon:'🥚', name:'PSB with Soft-boiled Eggs', desc:'Simple and elegant — steamed PSB with runny eggs and lemony yoghurt sauce.', time:'15 min', difficulty:'easy', seasons:['spring'], link:'https://www.bbcgoodfood.com/search?q=purple+sprouting+broccoli+eggs' },
+      { icon:'🫕', name:'PSB & Stilton Tart', desc:'Tender PSB in a quiche-style tart with crumbled Stilton and caramelised onions.', time:'70 min', difficulty:'medium', seasons:['spring','winter'], link:'https://www.bbcgoodfood.com/search?q=purple+sprouting+broccoli+tart' },
+      { icon:'🥘', name:'PSB Stir-fry', desc:'Quick-fried with garlic, ginger, soy and a drizzle of sesame oil.', time:'10 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=purple+sprouting+broccoli+stir+fry' },
+      { icon:'🍛', name:'PSB & Cheddar Gratin', desc:'Blanched PSB in a rich cheese sauce, topped with crispy breadcrumbs.', time:'45 min', difficulty:'medium', seasons:['spring','winter'], link:'https://www.bbcgoodfood.com/search?q=purple+sprouting+broccoli+gratin' },
+      { icon:'🥗', name:'PSB Salad with Tahini', desc:'Charred PSB on a bed of lentils and feta with a lemon tahini dressing.', time:'25 min', difficulty:'easy', seasons:['spring'], link:'https://www.bbcgoodfood.com/search?q=purple+sprouting+broccoli+salad' },
+      { icon:'🍕', name:'PSB & Mozzarella Pizza', desc:'Roasted PSB over a white pizza base with mozzarella, garlic and chilli flakes.', time:'30 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=purple+sprouting+broccoli+pizza' },
+      { icon:'🥙', name:'PSB with Romesco', desc:'Steamed PSB spears with a smoky red pepper and almond romesco sauce.', time:'20 min', difficulty:'easy', seasons:['spring'], link:'https://www.bbcgoodfood.com/search?q=purple+sprouting+broccoli+romesco' },
+      { icon:'🍳', name:'PSB & Halloumi Fry', desc:'PSB and halloumi pan-fried together with lemon and za\'atar.', time:'15 min', difficulty:'easy', seasons:['spring','summer'], link:'https://www.bbcgoodfood.com/search?q=purple+sprouting+broccoli+halloumi' },
+      { icon:'🥣', name:'PSB & Potato Soup', desc:'Spring greens soup with PSB, new potatoes, and a swirl of herb oil.', time:'30 min', difficulty:'easy', seasons:['spring'], link:'https://www.bbcgoodfood.com/search?q=purple+sprouting+broccoli+soup' },
     ]
   },
   {
@@ -1031,11 +1135,17 @@ const VEG = [
     note: 'Hardy and quick-growing, spring onions add freshness to everything. Easy to grow even in northern clay soils.',
     storage: '1 week in the fridge, wrapped in a damp paper towel. Can also stand in a glass of water on the windowsill.',
     grow: { sow: 'Mar–Aug (direct)', plant: 'N/A — direct sow', harvest: 'Jun–Oct', tip: 'Sow a short row every 3–4 weeks for a continuous harvest all summer. One of the easiest and most rewarding crops for northern beginners.' },
-    meals: [
-      { icon:'🥞', name:'Spring Onion Pancakes',           desc:'Chinese-inspired crispy flatbreads folded with sliced spring onions and sesame oil.',       time:'25 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=spring+onion+pancakes' },
-      { icon:'🥗', name:'Spring Salad',                    desc:'Shaved spring onions with radishes, peas and a cider vinegar vinaigrette.',                 time:'10 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=spring+salad+spring+onion' },
-      { icon:'🍜', name:'Spring Onion Ramen',              desc:'Quick broth with noodles topped with soft-boiled egg and plenty of sliced spring onions.',  time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=spring+onion+ramen' },
-      { icon:'🍳', name:'Potato & Spring Onion Frittata', desc:'Thick Italian-style omelette with cooked new potatoes and a generous bunch of spring onions.', time:'30 min', difficulty:'easy', link:'https://www.bbcgoodfood.com/search?q=spring+onion+frittata' },
+    mealPool: [
+      { icon:'🥞', name:'Spring Onion Pancakes', desc:'Chinese-inspired crispy flatbreads folded with sliced spring onions and sesame oil.', time:'25 min', difficulty:'medium', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=spring+onion+pancakes' },
+      { icon:'🥗', name:'Spring Salad', desc:'Shaved spring onions with radishes, peas and a cider vinegar vinaigrette.', time:'10 min', difficulty:'easy', seasons:['spring','summer'], link:'https://www.bbcgoodfood.com/search?q=spring+salad+spring+onion' },
+      { icon:'🍜', name:'Spring Onion Ramen', desc:'Quick broth with noodles topped with soft-boiled egg and plenty of sliced spring onions.', time:'20 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=spring+onion+ramen' },
+      { icon:'🍳', name:'Potato & Spring Onion Frittata', desc:'Thick Italian-style omelette with cooked new potatoes and a generous bunch of spring onions.', time:'30 min', difficulty:'easy', seasons:['spring','summer'], link:'https://www.bbcgoodfood.com/search?q=spring+onion+frittata' },
+      { icon:'🥙', name:'Spring Onion Quesadillas', desc:'Charred spring onions, smoked cheese and black beans folded in a crispy tortilla.', time:'15 min', difficulty:'easy', seasons:['summer','spring'], link:'https://www.bbcgoodfood.com/search?q=spring+onion+quesadilla' },
+      { icon:'🔥', name:'Grilled Spring Onions', desc:'Whole spring onions charred on a griddle with a romesco dipping sauce.', time:'15 min', difficulty:'easy', seasons:['spring','summer'], link:'https://www.bbcgoodfood.com/search?q=grilled+spring+onions' },
+      { icon:'🍛', name:'Spring Onion & Ginger Fried Rice', desc:'Day-old rice stir-fried with spring onions, ginger, soy and sesame.', time:'15 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=spring+onion+fried+rice' },
+      { icon:'🥣', name:'Spring Onion & Potato Soup', desc:'Gentle spring soup with spring onions, new potatoes and crème fraîche.', time:'25 min', difficulty:'easy', seasons:['spring'], link:'https://www.bbcgoodfood.com/search?q=spring+onion+soup' },
+      { icon:'🧀', name:'Spring Onion Cheese Scones', desc:'Fluffy scones loaded with mature cheddar and sliced spring onions.', time:'30 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=spring+onion+cheese+scones' },
+      { icon:'🍝', name:'Spring Onion & Prawn Pasta', desc:'Quick pasta with prawns, spring onions, lemon and white wine.', time:'20 min', difficulty:'easy', seasons:['spring','summer'], link:'https://www.bbcgoodfood.com/search?q=spring+onion+prawn+pasta' },
     ]
   },
   {
@@ -1044,11 +1154,17 @@ const VEG = [
     note: 'A fleeting but glorious crop — the northern season runs May to June. Worth the wait every single year.',
     storage: '2–3 days maximum. Store upright in a little cold water, like flowers, in the fridge. Eat as fresh as possible.',
     grow: { sow: 'Plant crowns Mar–Apr', plant: 'Mar–Apr (crowns)', harvest: 'Year 3 onwards: May–Jun', tip: 'Patience is essential — you must wait 2–3 years before your first harvest. But an established northern bed will produce for 20+ years. Choose an all-male variety like Gijnlim for best yields.' },
-    meals: [
-      { icon:'🥚', name:'Asparagus with Soft Eggs',  desc:'Blanched spears with runny soft-boiled eggs and shaved Parmesan — elegant simplicity.',       time:'12 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=asparagus+soft+boiled+eggs' },
-      { icon:'🍳', name:'Asparagus Omelette',        desc:'Lightly cooked tips folded into a buttery French omelette with goat\'s cheese.',              time:'15 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=asparagus+omelette' },
-      { icon:'🍝', name:'Asparagus & Lemon Pasta',  desc:'Shaved asparagus with tagliatelle, cream, lemon zest and toasted pine nuts.',                  time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=asparagus+lemon+pasta' },
-      { icon:'🥧', name:'Asparagus Tart',            desc:'Puff pastry base with crème fraîche, asparagus spears, ham and soft-boiled quail eggs.',      time:'45 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=asparagus+tart' },
+    mealPool: [
+      { icon:'🥚', name:'Asparagus with Soft Eggs', desc:'Blanched spears with runny soft-boiled eggs and shaved Parmesan — elegant simplicity.', time:'12 min', difficulty:'easy', seasons:['spring'], link:'https://www.bbcgoodfood.com/search?q=asparagus+soft+boiled+eggs' },
+      { icon:'🍳', name:'Asparagus Omelette', desc:'Lightly cooked tips folded into a buttery French omelette with goat\'s cheese.', time:'15 min', difficulty:'easy', seasons:['spring'], link:'https://www.bbcgoodfood.com/search?q=asparagus+omelette' },
+      { icon:'🍝', name:'Asparagus & Lemon Pasta', desc:'Shaved asparagus with tagliatelle, cream, lemon zest and toasted pine nuts.', time:'20 min', difficulty:'easy', seasons:['spring'], link:'https://www.bbcgoodfood.com/search?q=asparagus+lemon+pasta' },
+      { icon:'🥧', name:'Asparagus Tart', desc:'Puff pastry base with crème fraîche, asparagus spears, ham and quail eggs.', time:'45 min', difficulty:'medium', seasons:['spring'], link:'https://www.bbcgoodfood.com/search?q=asparagus+tart' },
+      { icon:'🥘', name:'Asparagus Risotto', desc:'Creamy risotto with asparagus tips and lemon — a springtime classic.', time:'40 min', difficulty:'medium', seasons:['spring'], link:'https://www.bbcgoodfood.com/search?q=asparagus+risotto' },
+      { icon:'🔥', name:'Griddled Asparagus', desc:'Asparagus charred on a griddle pan with olive oil, sea salt and lemon.', time:'10 min', difficulty:'easy', seasons:['spring'], link:'https://www.bbcgoodfood.com/search?q=griddled+asparagus' },
+      { icon:'🥗', name:'Asparagus & Smoked Salmon Salad', desc:'Blanched spears with smoked salmon, capers, dill and a mustard dressing.', time:'15 min', difficulty:'easy', seasons:['spring'], link:'https://www.bbcgoodfood.com/search?q=asparagus+smoked+salmon+salad' },
+      { icon:'🍕', name:'Asparagus & Parma Ham Pizza', desc:'Thin-crust pizza with ricotta, asparagus and torn Parma ham.', time:'30 min', difficulty:'easy', seasons:['spring'], link:'https://www.bbcgoodfood.com/search?q=asparagus+pizza' },
+      { icon:'🥣', name:'Cream of Asparagus Soup', desc:'Velvety blended soup with asparagus trimmings and stems — waste nothing.', time:'30 min', difficulty:'easy', seasons:['spring'], link:'https://www.bbcgoodfood.com/search?q=cream+asparagus+soup' },
+      { icon:'🧀', name:'Asparagus & Brie Toastie', desc:'Thick sourdough with melted Brie and two blanched asparagus spears.', time:'10 min', difficulty:'easy', seasons:['spring'], link:'https://www.bbcgoodfood.com/search?q=asparagus+brie+toast' },
     ]
   },
   {
@@ -1056,12 +1172,18 @@ const VEG = [
     months: [4,5,6,7,8,9], peak: [5,6,7], season: 'spring',
     note: 'Grows prolifically in the cool, moist northern summers. Bolt-resistant varieties do especially well.',
     storage: '2–3 days in the fridge in a sealed bag. Baby leaves wilt even faster — use them same day if possible.',
-    grow: { sow: 'Feb–May and Aug–Sep', plant: 'N/A — direct sow', harvest: 'Apr–Oct', tip: 'Sow in spring and again in late summer for two harvests. In the North, a late August sowing can produce into November under cover. Choose Perpetual Spinach for a hardier option.' },
-    meals: [
-      { icon:'🍛', name:'Saag Aloo',                    desc:'Classic North Indian spinach and potato curry — comforting, earthy and deeply spiced.',   time:'35 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=saag+aloo' },
-      { icon:'🥬', name:'Wilted Spinach & Garlic',      desc:'The simplest side — just butter, garlic and good-quality young spinach leaves.',          time:'5 min',   difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=wilted+spinach+garlic' },
-      { icon:'🥧', name:'Spinach & Ricotta Cannelloni', desc:'Tubes of pasta filled with spinach and ricotta, baked in a rich tomato sauce.',           time:'75 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=spinach+ricotta+cannelloni' },
-      { icon:'🍳', name:'Eggs Florentine',              desc:'Poached eggs on a bed of creamed spinach, finished with hollandaise sauce.',              time:'20 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=eggs+florentine' },
+    grow: { sow: 'Feb–May and Aug–Sep', plant: 'N/A — direct sow', harvest: 'Apr–Oct', tip: 'Sow in spring and again in late summer for two harvests. A late August sowing can produce into November under cover. Choose Perpetual Spinach for a hardier option.' },
+    mealPool: [
+      { icon:'🍛', name:'Saag Aloo', desc:'Classic North Indian spinach and potato curry — comforting, earthy and deeply spiced.', time:'35 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=saag+aloo' },
+      { icon:'🥬', name:'Wilted Spinach & Garlic', desc:'The simplest side — just butter, garlic and good-quality young spinach leaves.', time:'5 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=wilted+spinach+garlic' },
+      { icon:'🥧', name:'Spinach & Ricotta Cannelloni', desc:'Tubes of pasta filled with spinach and ricotta, baked in a rich tomato sauce.', time:'75 min', difficulty:'medium', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=spinach+ricotta+cannelloni' },
+      { icon:'🍳', name:'Eggs Florentine', desc:'Poached eggs on a bed of creamed spinach, finished with hollandaise sauce.', time:'20 min', difficulty:'medium', seasons:['spring','summer'], link:'https://www.bbcgoodfood.com/search?q=eggs+florentine' },
+      { icon:'🥗', name:'Baby Spinach Salad', desc:'Fresh baby spinach with strawberries, toasted almonds and a balsamic dressing.', time:'10 min', difficulty:'easy', seasons:['spring','summer'], link:'https://www.bbcgoodfood.com/search?q=spinach+salad+strawberry' },
+      { icon:'🍝', name:'Spinach & Lemon Pasta', desc:'Pasta tossed with wilted spinach, cream, lemon and a generous grating of Parmesan.', time:'15 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=spinach+lemon+pasta' },
+      { icon:'🫓', name:'Spinach & Feta Börek', desc:'Flaky filo pastry rolls filled with spinach, feta and nutmeg — great for a picnic.', time:'50 min', difficulty:'medium', seasons:['spring','summer'], link:'https://www.bbcgoodfood.com/search?q=spinach+feta+borek' },
+      { icon:'🍛', name:'Palak Paneer', desc:'Fresh spinach with soft Indian cheese in a lightly spiced sauce.', time:'35 min', difficulty:'medium', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=palak+paneer' },
+      { icon:'🥙', name:'Spinach & Hummus Wrap', desc:'Wholemeal wrap with hummus, baby spinach, roasted pepper and halloumi.', time:'10 min', difficulty:'easy', seasons:['spring','summer'], link:'https://www.bbcgoodfood.com/search?q=spinach+hummus+wrap' },
+      { icon:'🥘', name:'Spinach Dahl', desc:'Red lentils simmered with spinach, turmeric and a fried cumin and mustard seed tadka.', time:'35 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=spinach+dahl' },
     ]
   },
   {
@@ -1070,24 +1192,36 @@ const VEG = [
     note: 'A northern garden favourite — overwinter beans planted in autumn crop earliest. Double-pod for the sweetest taste.',
     storage: '3–5 days podded in the fridge. They freeze brilliantly — blanch for 2 minutes and freeze in bags for winter use.',
     grow: { sow: 'Oct–Nov (autumn sow) or Feb–Mar', plant: 'N/A — direct sow', harvest: 'Jun–Aug', tip: 'Autumn-sown broad beans are hardier and crop 4–6 weeks earlier than spring-sown. Pinch out the growing tips when the first pods form to deter blackfly — a common northern problem.' },
-    meals: [
-      { icon:'🥙', name:'Broad Bean Bruschetta',         desc:'Crushed broad beans with mint, lemon and ricotta on sourdough toast.',                  time:'10 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=broad+bean+bruschetta' },
-      { icon:'🫕', name:'Broad Bean & Pancetta Risotto', desc:'Creamy risotto with double-podded broad beans and crispy pancetta.',                    time:'45 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=broad+bean+pancetta+risotto' },
-      { icon:'🥗', name:'Broad Bean & Feta Salad',       desc:'Simple summer salad with lemon, mint and crumbled feta over podded beans.',             time:'10 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=broad+bean+feta+salad' },
-      { icon:'🍝', name:'Broad Bean Pasta',              desc:'Linguine with broad beans, peas, courgette ribbons and a light cream sauce.',           time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=broad+bean+pasta' },
+    mealPool: [
+      { icon:'🥙', name:'Broad Bean Bruschetta', desc:'Crushed broad beans with mint, lemon and ricotta on sourdough toast.', time:'10 min', difficulty:'easy', seasons:['summer','spring'], link:'https://www.bbcgoodfood.com/search?q=broad+bean+bruschetta' },
+      { icon:'🫕', name:'Broad Bean & Pancetta Risotto', desc:'Creamy risotto with double-podded broad beans and crispy pancetta.', time:'45 min', difficulty:'medium', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=broad+bean+pancetta+risotto' },
+      { icon:'🥗', name:'Broad Bean & Feta Salad', desc:'Simple summer salad with lemon, mint and crumbled feta over podded beans.', time:'10 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=broad+bean+feta+salad' },
+      { icon:'🍝', name:'Broad Bean Pasta', desc:'Linguine with broad beans, peas, courgette ribbons and a light cream sauce.', time:'20 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=broad+bean+pasta' },
+      { icon:'🥣', name:'Broad Bean Hummus', desc:'Blended broad beans with lemon, tahini and garlic — a brighter twist on classic hummus.', time:'15 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=broad+bean+hummus' },
+      { icon:'🍳', name:'Broad Bean & Mint Omelette', desc:'Light summer omelette with double-podded beans and fresh mint.', time:'10 min', difficulty:'easy', seasons:['summer','spring'], link:'https://www.bbcgoodfood.com/search?q=broad+bean+omelette' },
+      { icon:'🫘', name:'Ful Medames', desc:'Egyptian slow-cooked broad beans with cumin, lemon and a fried egg on top.', time:'20 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=ful+medames' },
+      { icon:'🍕', name:'Broad Bean & Goat\'s Cheese Pizza', desc:'Flatbread pizza with broad beans, whipped goat\'s cheese and mint oil.', time:'20 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=broad+bean+goats+cheese+pizza' },
+      { icon:'🥘', name:'Broad Bean & Lamb Stew', desc:'Spring lamb with broad beans, preserved lemon and herbs — Middle Eastern inspired.', time:'90 min', difficulty:'weekend', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=broad+bean+lamb+stew' },
+      { icon:'🥗', name:'Broad Bean & Halloumi Salad', desc:'Griddled halloumi with broad beans, lemon, mint and watercress.', time:'15 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=broad+bean+halloumi+salad' },
     ]
   },
   {
     name: 'Pea', latin: 'Pisum sativum', emoji: '🫛',
     months: [5,6,7,8], peak: [6,7], season: 'summer',
     note: "There's nothing better than fresh northern peas picked straight from the pod on a warm Dales morning.",
-    storage: '2–3 days in the pod in the fridge — their sugars convert to starch quickly. Freeze immediately after picking for the best flavour.',
+    storage: '2–3 days in the pod in the fridge. Freeze immediately after picking for the best flavour.',
     grow: { sow: 'Mar–Jun (direct)', plant: 'N/A — direct sow', harvest: 'Jun–Sep', tip: 'Provide strong support — northern winds can flatten unsupported pea plants. Sow every 3 weeks for a continuous harvest. Mangetout varieties do particularly well in cool northern summers.' },
-    meals: [
-      { icon:'🥣', name:'Minted Pea Soup',    desc:'Simple, vibrant blended soup with fresh mint, crème fraîche and warm bread.',              time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=minted+pea+soup' },
-      { icon:'🍛', name:'Pea & Mint Risotto', desc:'Blended pea and fresh mint stirred into creamy arborio rice.',                            time:'40 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=pea+mint+risotto' },
-      { icon:'🥗', name:'Pea & Ham Salad',   desc:'Yorkshire ham hock shredded over fresh peas, Little Gem and a mustardy dressing.',        time:'15 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=pea+ham+salad' },
-      { icon:'🫕', name:'Mushy Peas',        desc:'The northern classic — marrowfat peas simmered down with mint and a pinch of bicarbonate.', time:'20 min', difficulty:'easy',   link:'https://www.bbcgoodfood.com/search?q=mushy+peas+recipe' },
+    mealPool: [
+      { icon:'🥣', name:'Minted Pea Soup', desc:'Simple, vibrant blended soup with fresh mint, crème fraîche and warm bread.', time:'20 min', difficulty:'easy', seasons:['summer','spring'], link:'https://www.bbcgoodfood.com/search?q=minted+pea+soup' },
+      { icon:'🍛', name:'Pea & Mint Risotto', desc:'Blended pea and fresh mint stirred into creamy arborio rice.', time:'40 min', difficulty:'medium', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=pea+mint+risotto' },
+      { icon:'🥗', name:'Pea & Ham Salad', desc:'Yorkshire ham hock shredded over fresh peas, Little Gem and a mustardy dressing.', time:'15 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=pea+ham+salad' },
+      { icon:'🫕', name:'Mushy Peas', desc:'The northern classic — marrowfat peas simmered down with mint and a pinch of bicarbonate.', time:'20 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=mushy+peas+recipe' },
+      { icon:'🍳', name:'Pea & Prawn Omelette', desc:'A light summer omelette with sweet peas, prawns and fresh tarragon.', time:'12 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=pea+prawn+omelette' },
+      { icon:'🥙', name:'Pea & Ricotta Crostini', desc:'Crushed peas with ricotta, lemon and mint on toasted baguette slices.', time:'10 min', difficulty:'easy', seasons:['spring','summer'], link:'https://www.bbcgoodfood.com/search?q=pea+ricotta+crostini' },
+      { icon:'🍝', name:'Pasta e Piselli', desc:'Simple Italian pasta with peas, onion, Parmesan and a splash of the pasta water.', time:'20 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=pasta+peas+pasta+e+piselli' },
+      { icon:'🥘', name:'Pea & Potato Curry', desc:'Aloo matar — a gentle Indian curry of potatoes and peas with cumin and coriander.', time:'30 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=aloo+matar+pea+potato+curry' },
+      { icon:'🥗', name:'Smashed Pea & Avocado Toast', desc:'Smashed fresh peas with avocado, feta and chilli flakes on sourdough.', time:'10 min', difficulty:'easy', seasons:['summer','spring'], link:'https://www.bbcgoodfood.com/search?q=smashed+pea+avocado+toast' },
+      { icon:'🍜', name:'Pea & Mint Noodle Salad', desc:'Cold soba noodles with fresh peas, cucumber, mint and a sesame dressing.', time:'15 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=pea+noodle+salad' },
     ]
   },
   {
@@ -1095,12 +1229,18 @@ const VEG = [
     months: [6,7,8,9], peak: [7,8], season: 'summer',
     note: 'Prolific and versatile — one plant produces all summer long. Perfect for the northern polytunnel.',
     storage: '1 week in the fridge, uncovered. Don\'t wash until ready to use. Baby courgettes only last 3–4 days.',
-    grow: { sow: 'Apr–May (indoors)', plant: 'Jun (after last frost)', harvest: 'Jul–Oct', tip: "The North's late frosts mean you must wait until June to plant out. Start indoors in April and pot on once. Pick every 2–3 days to keep plants producing — a courgette left unpicked becomes a marrow overnight." },
-    meals: [
-      { icon:'🍕', name:"Courgette & Goat's Cheese Pizza", desc:"Shaved courgette with crumbled goat's cheese and lemon zest on a thin crust.",         time:'25 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=courgette+goats+cheese+pizza' },
-      { icon:'🥞', name:'Courgette Fritters',               desc:'Grated courgette fritters with feta and mint, served with cool yoghurt dip.',          time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=courgette+fritters' },
-      { icon:'🫕', name:'Stuffed Courgettes',               desc:'Halved and filled with herby rice, tomato and pine nuts, baked until tender.',         time:'50 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=stuffed+courgettes' },
-      { icon:'🍝', name:'Courgette Carbonara',              desc:'Ribboned courgette added to classic carbonara for a summer twist.',                    time:'20 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=courgette+carbonara' },
+    grow: { sow: 'Apr–May (indoors)', plant: 'Jun (after last frost)', harvest: 'Jul–Oct', tip: "The North's late frosts mean you must wait until June to plant out. Pick every 2–3 days to keep plants producing — a courgette left unpicked becomes a marrow overnight." },
+    mealPool: [
+      { icon:'🍕', name:"Courgette & Goat's Cheese Pizza", desc:"Shaved courgette with crumbled goat's cheese and lemon zest on a thin crust.", time:'25 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=courgette+goats+cheese+pizza' },
+      { icon:'🥞', name:'Courgette Fritters', desc:'Grated courgette fritters with feta and mint, served with cool yoghurt dip.', time:'20 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=courgette+fritters' },
+      { icon:'🫕', name:'Stuffed Courgettes', desc:'Halved and filled with herby rice, tomato and pine nuts, baked until tender.', time:'50 min', difficulty:'medium', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=stuffed+courgettes' },
+      { icon:'🍝', name:'Courgette Carbonara', desc:'Ribboned courgette added to classic carbonara for a summer twist.', time:'20 min', difficulty:'medium', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=courgette+carbonara' },
+      { icon:'🥗', name:'Raw Courgette Ribbon Salad', desc:'Shaved raw courgette with lemon, Parmesan, pine nuts and fresh basil.', time:'10 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=courgette+ribbon+salad' },
+      { icon:'🍛', name:'Courgette & Tomato Gratin', desc:'Sliced courgette and tomato layered with herbs and breadcrumbs, baked golden.', time:'50 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=courgette+tomato+gratin' },
+      { icon:'🍞', name:'Courgette Bread', desc:'Moist quick bread with grated courgette, lemon and herbs — great with soup.', time:'60 min', difficulty:'medium', seasons:['summer','autumn'], link:'https://www.bbcgoodfood.com/search?q=courgette+bread' },
+      { icon:'🥘', name:'Courgette & Chickpea Stew', desc:'Summer stew with courgette, chickpeas, tomatoes and harissa.', time:'30 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=courgette+chickpea+stew' },
+      { icon:'🔥', name:'BBQ Courgette with Miso', desc:'Halved courgettes glazed with miso and honey on the barbecue.', time:'15 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=bbq+courgette+miso' },
+      { icon:'🍰', name:'Courgette Cake', desc:'Moist chocolate and courgette loaf cake — nobody will know the vegetables are in there.', time:'65 min', difficulty:'medium', seasons:['summer','autumn'], link:'https://www.bbcgoodfood.com/search?q=courgette+chocolate+cake' },
     ]
   },
   {
@@ -1109,11 +1249,17 @@ const VEG = [
     note: 'The runner bean is the great northern cottage garden crop — bright red flowers and pods that keep on giving.',
     storage: '4–5 days in the fridge. Gluts freeze well — blanch for 3 minutes and freeze in portions.',
     grow: { sow: 'Apr–May (indoors)', plant: 'Jun', harvest: 'Jul–Oct', tip: 'Needs a warm, sheltered spot. Build a sturdy wigwam or double row of canes — runner beans grow 2–3m tall and catch northern winds badly. Water well at the base during flowering to set pods.' },
-    meals: [
-      { icon:'🍲', name:'Runner Bean Minestrone',  desc:'Classic Italian soup given a northern makeover with runner beans, tomatoes and barley.',  time:'50 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=runner+bean+minestrone' },
-      { icon:'🥘', name:'Runner Bean Chutney',     desc:'A northern allotment tradition — preserve the glut in a sweet and tangy chutney.',        time:'90 min',  difficulty:'weekend', link:'https://www.bbcgoodfood.com/search?q=runner+bean+chutney' },
-      { icon:'🥗', name:'Bean & Tomato Salad',    desc:'Blanched runner beans with cherry tomatoes, basil and a red wine vinaigrette.',            time:'15 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=runner+bean+tomato+salad' },
-      { icon:'🥩', name:'Runner Beans with Lamb', desc:'Slow-braised shoulder of lamb with runner beans and rosemary-garlic gravy.',               time:'3 hrs',   difficulty:'weekend', link:'https://www.bbcgoodfood.com/search?q=runner+beans+lamb' },
+    mealPool: [
+      { icon:'🍲', name:'Runner Bean Minestrone', desc:'Classic Italian soup given a northern makeover with runner beans, tomatoes and barley.', time:'50 min', difficulty:'easy', seasons:['summer','autumn'], link:'https://www.bbcgoodfood.com/search?q=runner+bean+minestrone' },
+      { icon:'🥘', name:'Runner Bean Chutney', desc:'A northern allotment tradition — preserve the glut in a sweet and tangy chutney.', time:'90 min', difficulty:'weekend', seasons:['summer','autumn'], link:'https://www.bbcgoodfood.com/search?q=runner+bean+chutney' },
+      { icon:'🥗', name:'Bean & Tomato Salad', desc:'Blanched runner beans with cherry tomatoes, basil and a red wine vinaigrette.', time:'15 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=runner+bean+tomato+salad' },
+      { icon:'🥩', name:'Runner Beans with Lamb', desc:'Slow-braised shoulder of lamb with runner beans and rosemary-garlic gravy.', time:'3 hrs', difficulty:'weekend', seasons:['summer','autumn'], link:'https://www.bbcgoodfood.com/search?q=runner+beans+lamb' },
+      { icon:'🍝', name:'Runner Bean Pasta', desc:'Sliced runner beans with olive oil, garlic, cherry tomatoes and basil over penne.', time:'20 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=runner+bean+pasta' },
+      { icon:'🍳', name:'Runner Bean & Egg Stir-fry', desc:'Sliced runner beans stir-fried with ginger, soy and a scrambled egg finish.', time:'15 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=runner+bean+stir+fry' },
+      { icon:'🫙', name:'Pickled Runner Beans', desc:'Beans pickled in vinegar and mustard seeds — great with cheese and cold meats.', time:'30 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=pickled+runner+beans' },
+      { icon:'🥣', name:'Runner Bean Soup', desc:'A comforting purée of runner beans with potato, shallot and tarragon.', time:'35 min', difficulty:'easy', seasons:['summer','autumn'], link:'https://www.bbcgoodfood.com/search?q=runner+bean+soup' },
+      { icon:'🥘', name:'Bean & Chorizo Stew', desc:'Runner beans with Spanish chorizo, smoked paprika and tomatoes.', time:'35 min', difficulty:'easy', seasons:['summer','autumn'], link:'https://www.bbcgoodfood.com/search?q=runner+bean+chorizo+stew' },
+      { icon:'🧀', name:'Runner Bean Gratin', desc:'Blanched beans layered with cream, Gruyère and mustard, baked until bubbling.', time:'45 min', difficulty:'medium', seasons:['summer','autumn'], link:'https://www.bbcgoodfood.com/search?q=green+bean+gratin' },
     ]
   },
   {
@@ -1121,12 +1267,18 @@ const VEG = [
     months: [7,8,9], peak: [8], season: 'summer',
     note: 'Northern varieties need the warmest spots — south-facing walls and polytunnels ripen cobs by August.',
     storage: '1–2 days only — sugars convert to starch very rapidly. Cook within hours of picking for the best flavour.',
-    grow: { sow: 'Apr–May (indoors)', plant: 'Jun', harvest: 'Aug–Sep', tip: 'Plant in a block rather than a row to aid wind pollination. In the North, choose early-ripening varieties like Swift or Earlibird, and give the warmest, most sheltered spot in the garden or use a polytunnel.' },
-    meals: [
-      { icon:'🔥', name:'Chargrilled Corn on the Cob', desc:'Blackened on a griddle or BBQ, slathered with chilli butter and lime.',                time:'15 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=chargrilled+sweetcorn' },
-      { icon:'🌮', name:'Sweetcorn Salsa',              desc:'Charred corn with red onion, jalapeño, coriander and lime — perfect with fish tacos.', time:'15 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=sweetcorn+salsa' },
-      { icon:'🥣', name:'Corn Chowder',                 desc:'Creamy soup with sweetcorn, potatoes, smoked haddock and a dill garnish.',            time:'40 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=corn+chowder' },
-      { icon:'🥞', name:'Sweetcorn Fritters',           desc:'Crispy corn fritters with spring onions, chilli and a soured cream dip.',            time:'25 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=sweetcorn+fritters' },
+    grow: { sow: 'Apr–May (indoors)', plant: 'Jun', harvest: 'Aug–Sep', tip: 'Plant in a block rather than a row to aid wind pollination. Choose early-ripening varieties like Swift or Earlibird for northern gardens.' },
+    mealPool: [
+      { icon:'🔥', name:'Chargrilled Corn on the Cob', desc:'Blackened on a griddle or BBQ, slathered with chilli butter and lime.', time:'15 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=chargrilled+sweetcorn' },
+      { icon:'🌮', name:'Sweetcorn Salsa', desc:'Charred corn with red onion, jalapeño, coriander and lime — perfect with fish tacos.', time:'15 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=sweetcorn+salsa' },
+      { icon:'🥣', name:'Corn Chowder', desc:'Creamy soup with sweetcorn, potatoes, smoked haddock and a dill garnish.', time:'40 min', difficulty:'easy', seasons:['summer','autumn'], link:'https://www.bbcgoodfood.com/search?q=corn+chowder' },
+      { icon:'🥞', name:'Sweetcorn Fritters', desc:'Crispy corn fritters with spring onions, chilli and a soured cream dip.', time:'25 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=sweetcorn+fritters' },
+      { icon:'🍕', name:'Sweetcorn & Chilli Pizza', desc:'Tomato base with sweetcorn, roasted chilli, smoked mozzarella and coriander.', time:'25 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=sweetcorn+pizza' },
+      { icon:'🥗', name:'Mexican Street Corn Salad', desc:'Elote-style salad with corn, cotija cheese, mayo, lime and chilli powder.', time:'20 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=mexican+street+corn+salad' },
+      { icon:'🍛', name:'Thai Sweetcorn Cakes', desc:'Crispy Thai-spiced corn cakes with a sweet chilli dipping sauce.', time:'25 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=thai+sweetcorn+cakes' },
+      { icon:'🥘', name:'Corn & Black Bean Enchiladas', desc:'Flour tortillas filled with corn, black beans and cheddar, baked in salsa roja.', time:'50 min', difficulty:'medium', seasons:['summer','autumn'], link:'https://www.bbcgoodfood.com/search?q=corn+black+bean+enchiladas' },
+      { icon:'🍜', name:'Sweetcorn Ramen', desc:'A creamy corn broth with noodles, soft-boiled egg and roasted sweetcorn.', time:'30 min', difficulty:'medium', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=sweetcorn+ramen' },
+      { icon:'🧀', name:'Corn & Cheddar Cornbread', desc:'Dense, golden American-style cornbread with grated mature cheddar.', time:'35 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=cheddar+sweetcorn+cornbread' },
     ]
   },
   {
@@ -1135,11 +1287,17 @@ const VEG = [
     note: 'Vibrant and earthy — grows brilliantly across the North. Eat the tops too: they\'re superb wilted like chard.',
     storage: '2–3 weeks in the fridge without tops. Remove leaves but leave 3cm of stalk to prevent bleeding.',
     grow: { sow: 'Mar–Jul (direct)', plant: 'N/A — direct sow', harvest: 'Jun–Oct', tip: 'Sow little and often for a continuous harvest. Bolt-resistant varieties like Boltardy are essential for northern spring sowing. Thin to 8cm apart for golf-ball-sized roots.' },
-    meals: [
-      { icon:'🥗', name:'Roasted Beet & Feta Salad', desc:'Wedges of roasted beetroot with walnuts, crumbled feta and rocket.',                    time:'60 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=roasted+beetroot+feta+salad' },
-      { icon:'🥣', name:'Borscht',                   desc:'Eastern European beet soup with cabbage, soured cream and rye bread.',                  time:'60 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=borscht+recipe' },
-      { icon:'🍔', name:'Beetroot Burger',            desc:'Deep purple patties made with beetroot, black beans and oats, in a brioche bun.',      time:'40 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=beetroot+burger' },
-      { icon:'🍰', name:'Chocolate Beetroot Cake',   desc:'Moist, fudgy cake that uses grated raw beetroot for incredible richness.',             time:'70 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=chocolate+beetroot+cake' },
+    mealPool: [
+      { icon:'🥗', name:'Roasted Beet & Feta Salad', desc:'Wedges of roasted beetroot with walnuts, crumbled feta and rocket.', time:'60 min', difficulty:'easy', seasons:['autumn','summer'], link:'https://www.bbcgoodfood.com/search?q=roasted+beetroot+feta+salad' },
+      { icon:'🥣', name:'Borscht', desc:'Eastern European beet soup with cabbage, soured cream and rye bread.', time:'60 min', difficulty:'medium', seasons:['autumn','winter'], link:'https://www.bbcgoodfood.com/search?q=borscht+recipe' },
+      { icon:'🍔', name:'Beetroot Burger', desc:'Deep purple patties made with beetroot, black beans and oats, in a brioche bun.', time:'40 min', difficulty:'medium', seasons:['summer','autumn'], link:'https://www.bbcgoodfood.com/search?q=beetroot+burger' },
+      { icon:'🍰', name:'Chocolate Beetroot Cake', desc:'Moist, fudgy cake that uses grated raw beetroot for incredible richness.', time:'70 min', difficulty:'medium', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=chocolate+beetroot+cake' },
+      { icon:'🥙', name:'Beetroot & Goat\'s Cheese Wrap', desc:'Roasted beetroot with whipped goat\'s cheese, rocket and walnuts in a flatbread.', time:'15 min', difficulty:'easy', seasons:['summer','autumn'], link:'https://www.bbcgoodfood.com/search?q=beetroot+goats+cheese+wrap' },
+      { icon:'🧀', name:'Beetroot Risotto', desc:'Deep crimson risotto with roasted beets, goat\'s cheese and thyme.', time:'50 min', difficulty:'medium', seasons:['autumn','winter'], link:'https://www.bbcgoodfood.com/search?q=beetroot+risotto' },
+      { icon:'🫙', name:'Pickled Beetroot', desc:'Classic northern pickled beets in spiced vinegar — essential for a ploughman\'s.', time:'30 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=pickled+beetroot' },
+      { icon:'🥗', name:'Warm Beetroot & Lentil Salad', desc:'French puy lentils with roasted beetroot, dill and a horseradish dressing.', time:'40 min', difficulty:'easy', seasons:['autumn'], link:'https://www.bbcgoodfood.com/search?q=beetroot+lentil+salad' },
+      { icon:'🍝', name:'Beetroot Pasta', desc:'Blended roasted beet stirred into pasta dough or sauce for a stunning crimson colour.', time:'30 min', difficulty:'medium', seasons:['autumn','winter'], link:'https://www.bbcgoodfood.com/search?q=beetroot+pasta' },
+      { icon:'🥪', name:'Beetroot & Smoked Mackerel', desc:'Earthy beet with smoked mackerel, horseradish cream and watercress on rye.', time:'10 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=beetroot+smoked+mackerel' },
     ]
   },
   {
@@ -1148,11 +1306,17 @@ const VEG = [
     note: 'Best grown in northern polytunnels or greenhouses. The flavour is incomparable to shop-bought.',
     storage: '1 week at room temperature (never in the fridge — cold kills the flavour). Ripen green ones on a windowsill.',
     grow: { sow: 'Feb–Mar (indoors)', plant: 'Jun (under cover or polytunnel)', harvest: 'Aug–Oct', tip: 'In the North, always grow indoors or under cover. Cherry varieties like Gardeners Delight and Sungold ripen fastest and cope best with the shorter northern summers.' },
-    meals: [
-      { icon:'🥗', name:'Caprese Salad',      desc:'Thick-sliced tomatoes with buffalo mozzarella, basil and the best olive oil you own.',     time:'10 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=caprese+salad' },
-      { icon:'🍝', name:'Fresh Tomato Pasta', desc:'Crushed fresh tomatoes tossed with garlic, basil and linguine — 15 minutes of summer.',  time:'15 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=fresh+tomato+pasta' },
-      { icon:'🫙', name:'Tomato Chutney',     desc:'A northern allotment essential — end-of-season glut turned into rich, spiced chutney.',  time:'90 min',  difficulty:'weekend', link:'https://www.bbcgoodfood.com/search?q=tomato+chutney' },
-      { icon:'🥪', name:'Pan con Tomate',     desc:'Ripe tomatoes grated onto sourdough with garlic and sea salt — Spanish simplicity.',     time:'5 min',   difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=pan+con+tomate' },
+    mealPool: [
+      { icon:'🥗', name:'Caprese Salad', desc:'Thick-sliced tomatoes with buffalo mozzarella, basil and the best olive oil you own.', time:'10 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=caprese+salad' },
+      { icon:'🍝', name:'Fresh Tomato Pasta', desc:'Crushed fresh tomatoes tossed with garlic, basil and linguine — 15 minutes of summer.', time:'15 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=fresh+tomato+pasta' },
+      { icon:'🫙', name:'Tomato Chutney', desc:'A northern allotment essential — end-of-season glut turned into rich, spiced chutney.', time:'90 min', difficulty:'weekend', seasons:['summer','autumn'], link:'https://www.bbcgoodfood.com/search?q=tomato+chutney' },
+      { icon:'🥪', name:'Pan con Tomate', desc:'Ripe tomatoes grated onto sourdough with garlic and sea salt — Spanish simplicity.', time:'5 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=pan+con+tomate' },
+      { icon:'🍲', name:'Slow-Roasted Tomato Soup', desc:'Tomatoes slow-roasted until deeply concentrated, blended into a velvety soup.', time:'2 hrs', difficulty:'easy', seasons:['summer','autumn'], link:'https://www.bbcgoodfood.com/search?q=slow+roasted+tomato+soup' },
+      { icon:'🫕', name:'Shakshuka', desc:'Eggs poached in a spiced tomato and pepper sauce — a glorious summer brunch.', time:'25 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=shakshuka' },
+      { icon:'🍕', name:'Margherita Pizza', desc:'The best pizza only works with the best tomatoes — this is peak-season food.', time:'30 min', difficulty:'medium', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=margherita+pizza' },
+      { icon:'🥗', name:'Panzanella', desc:'Tuscan bread salad with ripe tomatoes, cucumbers, red onion and basil.', time:'20 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=panzanella' },
+      { icon:'🫙', name:'Tomato Passata', desc:'Batch-process the glut into a smooth passata to freeze for winter use.', time:'60 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=homemade+passata' },
+      { icon:'🧄', name:'Tomato & Garlic Bruschetta', desc:'Vine-ripe tomatoes with garlic, olive oil and torn basil on toasted ciabatta.', time:'10 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=tomato+bruschetta' },
     ]
   },
   {
@@ -1161,24 +1325,36 @@ const VEG = [
     note: 'Autumn squash store brilliantly and thrive in northern growing conditions — Crown Prince and Butternut are favourites.',
     storage: '3–6 months in a cool, dry, frost-free place. Do not refrigerate — keep whole, unwashed, and check regularly.',
     grow: { sow: 'Apr–May (indoors)', plant: 'Jun', harvest: 'Sep–Nov', tip: 'Squash need space — allow 1.5m between plants. In the North, start early indoors and choose faster-ripening varieties. Cure harvested squash in the sun for 10 days to harden the skin for long storage.' },
-    meals: [
-      { icon:'🥣', name:'Roasted Squash Soup',       desc:'Halved squash roasted until caramelised, blended with ginger, coconut milk and chilli.',  time:'60 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=butternut+squash+soup' },
-      { icon:'🥘', name:'Squash & Sage Risotto',     desc:'Roasted squash stirred into a risotto with crispy fried sage leaves.',                    time:'50 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=squash+sage+risotto' },
-      { icon:'🌮', name:'Squash & Black Bean Tacos', desc:'Spiced roasted squash with chipotle, black beans and pickled onions in warm tortillas.',  time:'40 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=squash+black+bean+tacos' },
-      { icon:'🍛', name:'Thai Squash Curry',         desc:'Butternut squash simmered in a fragrant Thai green paste with coconut milk and lime.',    time:'45 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=thai+butternut+squash+curry' },
+    mealPool: [
+      { icon:'🥣', name:'Roasted Squash Soup', desc:'Halved squash roasted until caramelised, blended with ginger, coconut milk and chilli.', time:'60 min', difficulty:'easy', seasons:['autumn','winter'], link:'https://www.bbcgoodfood.com/search?q=butternut+squash+soup' },
+      { icon:'🥘', name:'Squash & Sage Risotto', desc:'Roasted squash stirred into a risotto with crispy fried sage leaves.', time:'50 min', difficulty:'medium', seasons:['autumn'], link:'https://www.bbcgoodfood.com/search?q=squash+sage+risotto' },
+      { icon:'🌮', name:'Squash & Black Bean Tacos', desc:'Spiced roasted squash with chipotle, black beans and pickled onions in warm tortillas.', time:'40 min', difficulty:'easy', seasons:['autumn'], link:'https://www.bbcgoodfood.com/search?q=squash+black+bean+tacos' },
+      { icon:'🍛', name:'Thai Squash Curry', desc:'Butternut squash simmered in a fragrant Thai green paste with coconut milk and lime.', time:'45 min', difficulty:'easy', seasons:['autumn','winter'], link:'https://www.bbcgoodfood.com/search?q=thai+butternut+squash+curry' },
+      { icon:'🍝', name:'Squash & Gorgonzola Pasta', desc:'Roasted squash with blue cheese, walnuts and sage through rigatoni.', time:'40 min', difficulty:'easy', seasons:['autumn'], link:'https://www.bbcgoodfood.com/search?q=squash+gorgonzola+pasta' },
+      { icon:'🥗', name:'Roasted Squash & Grain Salad', desc:'Warm salad with roasted squash, farro, dried cranberries and a maple dressing.', time:'50 min', difficulty:'easy', seasons:['autumn'], link:'https://www.bbcgoodfood.com/search?q=roasted+squash+grain+salad' },
+      { icon:'🫕', name:'Squash & Lentil Stew', desc:'Hearty autumnal stew with squash, puy lentils, tomatoes and ras el hanout.', time:'45 min', difficulty:'easy', seasons:['autumn','winter'], link:'https://www.bbcgoodfood.com/search?q=squash+lentil+stew' },
+      { icon:'🧀', name:'Stuffed Squash', desc:'Halved squash filled with herbed couscous, feta and pomegranate, baked until tender.', time:'70 min', difficulty:'medium', seasons:['autumn'], link:'https://www.bbcgoodfood.com/search?q=stuffed+butternut+squash' },
+      { icon:'🍕', name:'Squash & Ricotta Flatbread', desc:'Roasted squash with whipped ricotta, chilli honey and pumpkin seeds on a crispy base.', time:'30 min', difficulty:'easy', seasons:['autumn'], link:'https://www.bbcgoodfood.com/search?q=squash+ricotta+flatbread' },
+      { icon:'🥘', name:'Squash & Chorizo Tray Bake', desc:'Crown Prince squash chunks with chorizo, red onion and thyme roasted together.', time:'45 min', difficulty:'easy', seasons:['autumn','winter'], link:'https://www.bbcgoodfood.com/search?q=squash+chorizo+tray+bake' },
     ]
   },
   {
     name: 'Carrot', latin: 'Daucus carota', emoji: '🥕',
     months: [6,7,8,9,10,11,0,1], peak: [8,9,10], season: 'autumn',
     note: 'The sandy soils of coastal Lancashire and Yorkshire grow superb long carrots. Frost-sweet in autumn.',
-    storage: '2–3 weeks in the fridge. Remove tops before storing — they draw moisture from the root. Can be left in the ground until spring.',
+    storage: '2–3 weeks in the fridge. Remove tops before storing. Can be left in the ground until spring.',
     grow: { sow: 'Mar–Jul (direct)', plant: 'N/A — direct sow', harvest: 'Jun–Jan', tip: 'Carrots need deep, stone-free soil. In heavy northern clay, try short-rooted varieties like Chantenay or grow in raised beds. Thin early and cover with fleece against carrot fly.' },
-    meals: [
-      { icon:'🥣', name:'Carrot & Coriander Soup', desc:'Blended with onion, coriander seeds and a squeeze of orange — a warming classic.',   time:'35 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=carrot+coriander+soup' },
-      { icon:'🥩', name:'Glazed Roast Carrots',    desc:'Tossed with honey, thyme and butter, roasted until deeply caramelised.',             time:'40 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=glazed+roast+carrots' },
-      { icon:'🍰', name:'Carrot Cake',             desc:'Moist and warmly spiced, with cream cheese frosting and toasted walnut topping.',    time:'70 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=carrot+cake' },
-      { icon:'🫕', name:'Carrot & Lentil Dahl',   desc:'Warming, fragrant dahl with grated carrots, red lentils and coconut cream.',        time:'35 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=carrot+lentil+dahl' },
+    mealPool: [
+      { icon:'🥣', name:'Carrot & Coriander Soup', desc:'Blended with onion, coriander seeds and a squeeze of orange — a warming classic.', time:'35 min', difficulty:'easy', seasons:['autumn','winter'], link:'https://www.bbcgoodfood.com/search?q=carrot+coriander+soup' },
+      { icon:'🥩', name:'Glazed Roast Carrots', desc:'Tossed with honey, thyme and butter, roasted until deeply caramelised.', time:'40 min', difficulty:'easy', seasons:['autumn','winter'], link:'https://www.bbcgoodfood.com/search?q=glazed+roast+carrots' },
+      { icon:'🍰', name:'Carrot Cake', desc:'Moist and warmly spiced, with cream cheese frosting and toasted walnut topping.', time:'70 min', difficulty:'medium', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=carrot+cake' },
+      { icon:'🫕', name:'Carrot & Lentil Dahl', desc:'Warming, fragrant dahl with grated carrots, red lentils and coconut cream.', time:'35 min', difficulty:'easy', seasons:['autumn','winter'], link:'https://www.bbcgoodfood.com/search?q=carrot+lentil+dahl' },
+      { icon:'🥗', name:'Moroccan Carrot Salad', desc:'Roasted carrots with cumin, harissa, preserved lemon and fresh herbs.', time:'35 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=moroccan+carrot+salad' },
+      { icon:'🥘', name:'Carrot & Ginger Stir-fry', desc:'Julienned carrots with ginger, sesame and soy — a quick and vibrant side.', time:'10 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=carrot+ginger+stir+fry' },
+      { icon:'🫘', name:'Carrot & Chickpea Tagine', desc:'Slow-cooked tagine with carrots, chickpeas, apricots and ras el hanout.', time:'60 min', difficulty:'medium', seasons:['autumn','winter'], link:'https://www.bbcgoodfood.com/search?q=carrot+chickpea+tagine' },
+      { icon:'🥙', name:'Carrot & Hummus Wrap', desc:'Grated carrot with hummus, feta, cucumber and mint in a warm flatbread.', time:'10 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=carrot+hummus+wrap' },
+      { icon:'🍞', name:'Carrot & Walnut Muffins', desc:'Earthy, warmly spiced savoury muffins with grated carrot and toasted walnuts.', time:'35 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=carrot+walnut+muffins' },
+      { icon:'🥕', name:'Carrot & Swede Mash', desc:'A northern classic — equal parts carrot and swede mashed with butter and black pepper.', time:'25 min', difficulty:'easy', seasons:['autumn','winter'], link:'https://www.bbcgoodfood.com/search?q=carrot+swede+mash' },
     ]
   },
   {
@@ -1187,11 +1363,17 @@ const VEG = [
     note: 'The humble turnip has long fed both people and livestock across Northumberland and Durham. Deeply underrated.',
     storage: '2–3 weeks in a cool dark place. Remove leaves before storing. Small turnips keep best.',
     grow: { sow: 'Mar–Aug (direct)', plant: 'N/A — direct sow', harvest: 'Jun–Nov (summer) or Oct–Mar (winter)', tip: 'One of the easiest and fastest crops in the northern garden — summer turnips are ready in 6–8 weeks. Sow in August for a winter crop. A reliable performer in northern clay soils.' },
-    meals: [
-      { icon:'🥣', name:'Turnip & Lentil Soup',    desc:'Diced turnip simmered with red lentils, onion and cumin — earthy and deeply warming.',      time:'35 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=turnip+lentil+soup' },
-      { icon:'🫕', name:'Northumberland Stew',     desc:'Slow-cooked with shin beef, swede, carrot and turnip in a dark, herb-rich gravy.',          time:'2.5 hrs', difficulty:'weekend', link:'https://www.bbcgoodfood.com/search?q=beef+turnip+stew' },
-      { icon:'🥘', name:'Roasted Turnips',         desc:'Cubed and roasted with honey and thyme until caramelised and sweet.',                        time:'35 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=roasted+turnips' },
-      { icon:'🥔', name:'Turnip Mash',             desc:'Mashed with butter and black pepper — a brilliant partner for venison sausages.',           time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=turnip+mash' },
+    mealPool: [
+      { icon:'🥣', name:'Turnip & Lentil Soup', desc:'Diced turnip simmered with red lentils, onion and cumin — earthy and deeply warming.', time:'35 min', difficulty:'easy', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=turnip+lentil+soup' },
+      { icon:'🫕', name:'Northumberland Stew', desc:'Slow-cooked with shin beef, swede, carrot and turnip in a dark, herb-rich gravy.', time:'2.5 hrs', difficulty:'weekend', seasons:['winter'], link:'https://www.bbcgoodfood.com/search?q=beef+turnip+stew' },
+      { icon:'🥘', name:'Roasted Turnips with Honey', desc:'Cubed and roasted with honey and thyme until caramelised and sweet.', time:'35 min', difficulty:'easy', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=roasted+turnips' },
+      { icon:'🥔', name:'Turnip Mash', desc:'Mashed with butter and black pepper — a brilliant partner for venison sausages.', time:'20 min', difficulty:'easy', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=turnip+mash' },
+      { icon:'🍛', name:'Turnip & Potato Gratin', desc:'Thinly sliced turnip and potato layered in cream with garlic and nutmeg.', time:'75 min', difficulty:'medium', seasons:['winter'], link:'https://www.bbcgoodfood.com/search?q=turnip+potato+gratin' },
+      { icon:'🥗', name:'Pickled Turnip', desc:'Middle Eastern-style pickled turnip in vinegar and beetroot — vivid pink and tangy.', time:'15 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=pickled+turnip' },
+      { icon:'🍲', name:'Japanese Turnip Soup', desc:'Diced turnip in a clear dashi broth with miso, tofu and spring onions.', time:'20 min', difficulty:'easy', seasons:['winter'], link:'https://www.bbcgoodfood.com/search?q=turnip+miso+soup' },
+      { icon:'🥘', name:'Turnip & Sausage Hotpot', desc:'A northern farmhouse dish — pork sausages and turnip in a rich onion gravy.', time:'60 min', difficulty:'easy', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=sausage+turnip+hotpot' },
+      { icon:'🥗', name:'Shaved Turnip Salad', desc:'Paper-thin raw turnip with apple, fennel, dill and a cider dressing.', time:'15 min', difficulty:'easy', seasons:['spring','summer'], link:'https://www.bbcgoodfood.com/search?q=raw+turnip+salad' },
+      { icon:'🫕', name:'Turnip Curry', desc:'Turnip cooked in a tarka dhal style with mustard seeds, turmeric and coriander.', time:'35 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=turnip+curry' },
     ]
   },
   {
@@ -1200,11 +1382,17 @@ const VEG = [
     note: "Called 'neep' in Northumberland and Cumbria, swede is the great unsung vegetable of the north — sweeter than turnip.",
     storage: '3–4 weeks in a cool dark place. Rock-hard when fresh, softens slightly in storage — both textures are good.',
     grow: { sow: 'May–Jun (direct)', plant: 'N/A — direct sow', harvest: 'Sep–Mar', tip: "Swede is a superb crop for northern allotments — it's frost-hardy and can be left in the ground all winter to harvest as needed. Allow 30cm spacing. Net against cabbage white butterflies." },
-    meals: [
-      { icon:'🥩', name:'Haggis, Neeps & Tatties', desc:'The classic combination — swede mashed with butter alongside haggis and fluffy potato.', time:'40 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=neeps+tatties+recipe' },
-      { icon:'🥣', name:'Swede & Bacon Soup',       desc:'Roasted swede blended with chicken stock and crispy smoked Northumberland bacon.',       time:'50 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=swede+soup' },
-      { icon:'🫕', name:'Swede & Lamb Hotpot',      desc:'A northern hotpot with diced swede layered beneath the potato crust with lamb.',        time:'2 hrs',   difficulty:'weekend', link:'https://www.bbcgoodfood.com/search?q=swede+lamb+hotpot' },
-      { icon:'🥕', name:'Swede Dauphinoise',        desc:'Thinly sliced swede baked in cream and garlic — earthy, robust and deeply satisfying.', time:'80 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=swede+dauphinoise' },
+    mealPool: [
+      { icon:'🥩', name:'Haggis, Neeps & Tatties', desc:'The classic combination — swede mashed with butter alongside haggis and fluffy potato.', time:'40 min', difficulty:'medium', seasons:['winter'], link:'https://www.bbcgoodfood.com/search?q=neeps+tatties+recipe' },
+      { icon:'🥣', name:'Swede & Bacon Soup', desc:'Roasted swede blended with chicken stock and crispy smoked Northumberland bacon.', time:'50 min', difficulty:'easy', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=swede+soup' },
+      { icon:'🫕', name:'Swede & Lamb Hotpot', desc:'A northern hotpot with diced swede layered beneath the potato crust with lamb.', time:'2 hrs', difficulty:'weekend', seasons:['winter'], link:'https://www.bbcgoodfood.com/search?q=swede+lamb+hotpot' },
+      { icon:'🥕', name:'Swede Dauphinoise', desc:'Thinly sliced swede baked in cream and garlic — earthy, robust and deeply satisfying.', time:'80 min', difficulty:'medium', seasons:['winter'], link:'https://www.bbcgoodfood.com/search?q=swede+dauphinoise' },
+      { icon:'🥔', name:'Swede Chips', desc:'Chunky swede wedges roasted like chips until caramelised on the outside.', time:'40 min', difficulty:'easy', seasons:['autumn','winter'], link:'https://www.bbcgoodfood.com/search?q=swede+chips' },
+      { icon:'🍛', name:'Swede & Chickpea Curry', desc:'Swede simmered in a fragrant curry sauce with chickpeas and spinach.', time:'40 min', difficulty:'easy', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=swede+chickpea+curry' },
+      { icon:'🥗', name:'Swede & Carrot Slaw', desc:'Grated raw swede and carrot with apple, raisins and a tangy mustard dressing.', time:'15 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=swede+carrot+slaw' },
+      { icon:'🥘', name:'Swede & Beef Casserole', desc:'Slow-cooked shin of beef with swede, carrots and a dark stout gravy.', time:'3 hrs', difficulty:'weekend', seasons:['winter'], link:'https://www.bbcgoodfood.com/search?q=beef+swede+casserole' },
+      { icon:'🧅', name:'Swede & Caramelised Onion Pasty', desc:'Cornish-style pasty with swede, caramelised onions and mature cheddar.', time:'90 min', difficulty:'weekend', seasons:['autumn','winter'], link:'https://www.bbcgoodfood.com/search?q=swede+pasty' },
+      { icon:'🥣', name:'Swede & Apple Soup', desc:'Swede roasted with apple for a sweeter, more delicate winter soup.', time:'45 min', difficulty:'easy', seasons:['autumn','winter'], link:'https://www.bbcgoodfood.com/search?q=swede+apple+soup' },
     ]
   },
   {
@@ -1213,11 +1401,17 @@ const VEG = [
     note: 'Rainbow chard flourishes in the sheltered valleys of Cumbria and Durham. Colourful, hardy and productive.',
     storage: '3–5 days in the fridge. Keeps best with stems wrapped in a damp cloth and leaves loosely sealed.',
     grow: { sow: 'Apr–Jul (direct)', plant: 'N/A — direct sow', harvest: 'Jun–Nov', tip: "Rainbow chard is almost indestructible in northern gardens — it withstands summer heat and autumn frosts alike. Pick outer leaves to keep the plant productive. A late July sowing will produce into winter under cover." },
-    meals: [
-      { icon:'🍳', name:'Chard & Egg Bake',       desc:'Wilted chard with eggs cracked on top, finished under the grill with cheese and chilli.',       time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=chard+baked+eggs' },
-      { icon:'🥘', name:'Chard & Chickpea Stew',  desc:'North African-spiced chickpeas with tumbled chard leaves and harissa yoghurt.',               time:'30 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=chard+chickpea+stew' },
-      { icon:'🫕', name:'Chard & Ricotta Gnudi',  desc:'Pillowy ricotta dumplings with wilted chard, brown butter and sage — simple elegance.',        time:'45 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=chard+ricotta+gnudi' },
-      { icon:'🍝', name:'Chard Stem Gratin',      desc:"Don't waste the stalks — bake them in a white sauce with gruyère until golden.",               time:'50 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=chard+gratin' },
+    mealPool: [
+      { icon:'🍳', name:'Chard & Egg Bake', desc:'Wilted chard with eggs cracked on top, finished under the grill with cheese and chilli.', time:'20 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=chard+baked+eggs' },
+      { icon:'🥘', name:'Chard & Chickpea Stew', desc:'North African-spiced chickpeas with tumbled chard leaves and harissa yoghurt.', time:'30 min', difficulty:'easy', seasons:['summer','autumn'], link:'https://www.bbcgoodfood.com/search?q=chard+chickpea+stew' },
+      { icon:'🫕', name:'Chard & Ricotta Gnudi', desc:'Pillowy ricotta dumplings with wilted chard, brown butter and sage — simple elegance.', time:'45 min', difficulty:'medium', seasons:['summer','autumn'], link:'https://www.bbcgoodfood.com/search?q=chard+ricotta+gnudi' },
+      { icon:'🍝', name:'Chard Stem Gratin', desc:"Don't waste the stalks — bake them in a white sauce with gruyère until golden.", time:'50 min', difficulty:'medium', seasons:['autumn','winter'], link:'https://www.bbcgoodfood.com/search?q=chard+gratin' },
+      { icon:'🥗', name:'Rainbow Chard Salad', desc:'Blanched chard with tahini dressing, pomegranate seeds and toasted pine nuts.', time:'15 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=rainbow+chard+salad' },
+      { icon:'🍝', name:'Chard & Lemon Pasta', desc:'Wilted chard with garlic, lemon zest, capers and Parmesan through linguine.', time:'20 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=chard+lemon+pasta' },
+      { icon:'🥙', name:'Chard & Feta Börek', desc:'Crispy filo rolls filled with wilted chard, feta and nutmeg.', time:'50 min', difficulty:'medium', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=chard+feta+borek' },
+      { icon:'🍛', name:'Chard & Potato Curry', desc:'Rainbow chard with cubed potatoes in a coconut and turmeric sauce.', time:'35 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=chard+potato+curry' },
+      { icon:'🧀', name:'Chard & Goat\'s Cheese Tart', desc:'Wilted chard in a shortcrust pastry case with goat\'s cheese and caramelised shallots.', time:'70 min', difficulty:'medium', seasons:['summer','autumn'], link:'https://www.bbcgoodfood.com/search?q=chard+goats+cheese+tart' },
+      { icon:'🥘', name:'Portuguese Chard Soup', desc:'Caldo verde inspired — chard ribbons in a potato and chorizo broth.', time:'30 min', difficulty:'easy', seasons:['autumn','winter'], link:'https://www.bbcgoodfood.com/search?q=chard+soup+portuguese' },
     ]
   },
   {
@@ -1226,37 +1420,55 @@ const VEG = [
     note: "Grows like a weed across Northumberland and Durham allotments — once planted, you'll never be without them.",
     storage: '1–2 weeks in a cool dark place or fridge. Very perishable once cut — use quickly.',
     grow: { sow: 'N/A', plant: 'Plant tubers Feb–Apr', harvest: 'Oct–Mar', tip: 'Planted once, they return every year without fail — a blessing for the lazy northern gardener. They grow 2–3m tall and make an excellent windbreak. Save a few small tubers from the harvest to replant for next year.' },
-    meals: [
-      { icon:'🥣', name:'Jerusalem Artichoke Soup',    desc:'Silky, nutty bisque with a swirl of truffle oil and toasted hazelnuts — winter luxury.',  time:'45 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=jerusalem+artichoke+soup' },
-      { icon:'🥘', name:'Roasted Artichokes & Garlic', desc:'Halved and roasted with whole garlic cloves, thyme and a splash of white wine.',           time:'40 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=roasted+jerusalem+artichokes' },
-      { icon:'🍕', name:'Artichoke & Mushroom Tart',  desc:'Thinly sliced artichokes on a puff pastry base with wild mushrooms and Taleggio.',         time:'55 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=jerusalem+artichoke+tart' },
-      { icon:'🥗', name:'Raw Artichoke Salad',        desc:'Paper-thin raw slices with lemon, parmesan, rocket and toasted pine nuts.',                time:'10 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=jerusalem+artichoke+salad' },
+    mealPool: [
+      { icon:'🥣', name:'Jerusalem Artichoke Soup', desc:'Silky, nutty bisque with a swirl of truffle oil and toasted hazelnuts — winter luxury.', time:'45 min', difficulty:'easy', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=jerusalem+artichoke+soup' },
+      { icon:'🥘', name:'Roasted Artichokes & Garlic', desc:'Halved and roasted with whole garlic cloves, thyme and a splash of white wine.', time:'40 min', difficulty:'easy', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=roasted+jerusalem+artichokes' },
+      { icon:'🍕', name:'Artichoke & Mushroom Tart', desc:'Thinly sliced artichokes on a puff pastry base with wild mushrooms and Taleggio.', time:'55 min', difficulty:'medium', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=jerusalem+artichoke+tart' },
+      { icon:'🥗', name:'Raw Artichoke Salad', desc:'Paper-thin raw slices with lemon, parmesan, rocket and toasted pine nuts.', time:'10 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=jerusalem+artichoke+salad' },
+      { icon:'🥔', name:'Artichoke Gratin', desc:'Sliced artichokes baked in cream with Gruyère — like a potato gratin but nuttier.', time:'60 min', difficulty:'medium', seasons:['winter'], link:'https://www.bbcgoodfood.com/search?q=jerusalem+artichoke+gratin' },
+      { icon:'🍝', name:'Artichoke & Truffle Pasta', desc:'Roasted artichokes with pasta, butter, Parmesan and a few drops of truffle oil.', time:'35 min', difficulty:'easy', seasons:['winter'], link:'https://www.bbcgoodfood.com/search?q=jerusalem+artichoke+pasta' },
+      { icon:'🥘', name:'Artichoke & Pheasant Braise', desc:'Wild pheasant braised slowly with Jerusalem artichokes, cider and thyme.', time:'2 hrs', difficulty:'weekend', seasons:['winter'], link:'https://www.bbcgoodfood.com/search?q=pheasant+jerusalem+artichoke' },
+      { icon:'🧀', name:'Artichoke & Brie Toastie', desc:'Thinly sliced artichoke with melted Brie and caramelised onions on sourdough.', time:'15 min', difficulty:'easy', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=jerusalem+artichoke+cheese+toastie' },
+      { icon:'🥙', name:'Artichoke Crisps', desc:'Wafer-thin artichoke slices deep-fried until golden — addictive as a snack.', time:'20 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=jerusalem+artichoke+crisps' },
+      { icon:'🍛', name:'Artichoke & Lentil Pilaf', desc:'Roasted artichoke chunks stirred through spiced lentils with pomegranate and herbs.', time:'40 min', difficulty:'easy', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=jerusalem+artichoke+lentil' },
     ]
   },
   {
     name: 'Potato', latin: 'Solanum tuberosum', emoji: '🥔',
     months: [0,1,2,3,4,5,6,7,8,9,10,11], peak: [6,7,8,9,10], season: 'yearround',
     note: 'The foundation of northern cooking. Maris Pipers, King Edwards and Charlottes all thrive in northern soils.',
-    storage: 'Months in a cool, dark, dry place (a hessian sack is ideal). Never in the fridge — the cold converts starch to sugar and turns them black when cooked.',
-    grow: { sow: 'Chit from Feb', plant: 'Mar–May', harvest: 'Jun–Oct', tip: 'The North is potato country — the cool, damp climate produces superb flavour. Earth up stems regularly to protect tubers from light (which causes greening). Maincrop varieties left in the ground too long will be eaten by slugs — harvest before October.' },
-    meals: [
-      { icon:'🥘', name:'Proper Chips',         desc:'Triple-cooked in dripping or beef fat — the northern chip shop is unmatched.',                  time:'90 min',  difficulty:'weekend', link:'https://www.bbcgoodfood.com/search?q=triple+cooked+chips' },
-      { icon:'🫕', name:'Lancashire Hotpot',    desc:'Slow-braised lamb neck with onions, topped with a crown of thinly sliced golden potato.',     time:'2.5 hrs', difficulty:'weekend', link:'https://www.bbcgoodfood.com/search?q=lancashire+hotpot' },
-      { icon:'🥔', name:'Baked Potato',         desc:'Enormous floury baked potatoes with toppings: baked beans, mature cheddar or pulled pork.',   time:'75 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=perfect+baked+potato' },
-      { icon:'🥗', name:'New Potato Salad',     desc:'Waxy new potatoes dressed while warm with vinegar, mustard and spring onions.',               time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=new+potato+salad' },
+    storage: 'Months in a cool, dark, dry place. Never in the fridge — cold converts starch to sugar and turns them black when cooked.',
+    grow: { sow: 'Chit from Feb', plant: 'Mar–May', harvest: 'Jun–Oct', tip: 'The North is potato country — the cool, damp climate produces superb flavour. Earth up stems regularly to protect tubers from light. Maincrop varieties left in the ground too long will be eaten by slugs — harvest before October.' },
+    mealPool: [
+      { icon:'🥘', name:'Proper Chips', desc:'Triple-cooked in dripping or beef fat — the northern chip shop is unmatched.', time:'90 min', difficulty:'weekend', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=triple+cooked+chips' },
+      { icon:'🫕', name:'Lancashire Hotpot', desc:'Slow-braised lamb neck with onions, topped with a crown of thinly sliced golden potato.', time:'2.5 hrs', difficulty:'weekend', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=lancashire+hotpot' },
+      { icon:'🥔', name:'Baked Potato', desc:'Enormous floury baked potatoes with toppings: baked beans, mature cheddar or pulled pork.', time:'75 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=perfect+baked+potato' },
+      { icon:'🥗', name:'New Potato Salad', desc:'Waxy new potatoes dressed while warm with vinegar, mustard and spring onions.', time:'20 min', difficulty:'easy', seasons:['summer','spring'], link:'https://www.bbcgoodfood.com/search?q=new+potato+salad' },
+      { icon:'🥔', name:'Duchess Potatoes', desc:'Piped potato rosettes baked until golden — a northern Sunday dinner essential.', time:'50 min', difficulty:'medium', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=duchess+potatoes' },
+      { icon:'🧀', name:'Potato Dauphinoise', desc:'Thinly sliced potatoes baked in garlic cream — the finest potato dish in existence.', time:'80 min', difficulty:'medium', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=potato+dauphinoise' },
+      { icon:'🥘', name:'Bombay Potatoes', desc:'Spiced potato cubes fried with mustard seeds, turmeric and green chilli.', time:'25 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=bombay+potatoes' },
+      { icon:'🥗', name:'Potato & Chorizo Salad', desc:'New potatoes with crispy chorizo, capers, red onion and a sherry vinaigrette.', time:'25 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=potato+chorizo+salad' },
+      { icon:'🍳', name:'Rösti', desc:'Grated potato pressed and fried into a crispy golden cake — fantastic with smoked salmon.', time:'30 min', difficulty:'medium', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=rosti+recipe' },
+      { icon:'🥙', name:'Potato Pierogis', desc:'Eastern European dumplings filled with mashed potato and cheddar, fried in butter.', time:'90 min', difficulty:'weekend', seasons:['winter'], link:'https://www.bbcgoodfood.com/search?q=potato+pierogi+recipe' },
     ]
   },
   {
     name: 'Onion', latin: 'Allium cepa', emoji: '🧅',
     months: [0,1,2,3,4,5,6,7,8,9,10,11], peak: [7,8,9], season: 'yearround',
     note: 'Onions store all winter after a summer harvest — the base of virtually every northern dish worth cooking.',
-    storage: '2–3 months in a cool, dark, dry, well-ventilated place. Braided ropes or nets work best. Never store near potatoes.',
+    storage: '2–3 months in a cool, dark, dry, well-ventilated place. Never store near potatoes.',
     grow: { sow: 'Plant sets Mar–Apr or Aug–Sep', plant: 'Mar–Apr (spring) or Sep (autumn)', harvest: 'Jul–Sep', tip: 'Sets (small bulbs) are easier than seed for northern growers. Autumn-planted varieties overwinter and crop earlier the following July. Lift and dry thoroughly in the sun before storing.' },
-    meals: [
-      { icon:'🥣', name:'French Onion Soup',       desc:'Slowly caramelised onions in a rich beef broth, topped with Gruyère croutons.',             time:'80 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=french+onion+soup' },
-      { icon:'🥧', name:'Caramelised Onion Tart',  desc:'Sweet onions in a buttery pastry case with thyme, Gruyère and a touch of balsamic.',       time:'90 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=caramelised+onion+tart' },
-      { icon:'🫙', name:'Pickled Onions',          desc:'A northern pub staple — vinegar-sharp pickled onions perfect with a ploughman\'s.',         time:'30 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=pickled+onions' },
-      { icon:'🫕', name:'Onion Gravy',             desc:'Slow-cooked onions deglazed with ale and beef stock — transformative on sausage and mash.', time:'30 min', difficulty:'easy',   link:'https://www.bbcgoodfood.com/search?q=onion+gravy' },
+    mealPool: [
+      { icon:'🥣', name:'French Onion Soup', desc:'Slowly caramelised onions in a rich beef broth, topped with Gruyère croutons.', time:'80 min', difficulty:'medium', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=french+onion+soup' },
+      { icon:'🥧', name:'Caramelised Onion Tart', desc:'Sweet onions in a buttery pastry case with thyme, Gruyère and a touch of balsamic.', time:'90 min', difficulty:'medium', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=caramelised+onion+tart' },
+      { icon:'🫙', name:'Pickled Onions', desc:'A northern pub staple — vinegar-sharp pickled onions perfect with a ploughman\'s.', time:'30 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=pickled+onions' },
+      { icon:'🫕', name:'Onion Gravy', desc:'Slow-cooked onions deglazed with ale and beef stock — transformative on sausage and mash.', time:'30 min', difficulty:'easy', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=onion+gravy' },
+      { icon:'🧅', name:'Onion Bhajis', desc:'Crispy spiced onion fritters — perfect with mango chutney and raita.', time:'25 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=onion+bhajis' },
+      { icon:'🍕', name:'Pissaladière', desc:'Provençal tart with a sweet caramelised onion topping, anchovies and olives.', time:'2 hrs', difficulty:'weekend', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=pissaladiere' },
+      { icon:'🥘', name:'Stuffed Onions', desc:'Large onions hollowed and filled with herbed minced beef, then braised in stock.', time:'80 min', difficulty:'medium', seasons:['winter','autumn'], link:'https://www.bbcgoodfood.com/search?q=stuffed+onions' },
+      { icon:'🥗', name:'Red Onion Relish', desc:'Slow-cooked red onions in balsamic and brown sugar — perfect with cheese or burgers.', time:'40 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=red+onion+relish' },
+      { icon:'🥙', name:'Onion & Cheddar Flatbreads', desc:'Quick flatbreads topped with caramelised onions and melted mature cheddar.', time:'25 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=onion+cheddar+flatbread' },
+      { icon:'🍳', name:'Spanish Omelette', desc:'A proper tortilla española — thick, creamy omelette with potato and sweet onion.', time:'35 min', difficulty:'medium', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=spanish+tortilla+omelette' },
     ]
   },
   {
@@ -1265,14 +1477,22 @@ const VEG = [
     note: 'Planted in October, harvested in July — northern gardeners are discovering how well British garlic grows.',
     storage: 'Several months in a cool, dry, well-ventilated place. Keep whole until needed — broken bulbs last only 1–2 weeks.',
     grow: { sow: 'N/A', plant: 'Oct–Nov (best) or Feb–Mar', harvest: 'Jun–Jul', tip: 'Autumn planting is essential in the North — garlic needs a cold period to form good bulbs. Softneck varieties store longer; hardneck (Rocambole types) have superior flavour. Harvest when half the leaves have yellowed.' },
-    meals: [
-      { icon:'🍝', name:'Spaghetti Aglio e Olio', desc:'Pasta with golden garlic slices, chilli flakes and good olive oil — Italian simplicity.',    time:'15 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=spaghetti+aglio+olio' },
-      { icon:'🥖', name:'Garlic Bread',            desc:'Proper homemade garlic butter with parsley slathered into a baguette and baked golden.',    time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=homemade+garlic+bread' },
-      { icon:'🫕', name:'Roasted Garlic',          desc:'Whole heads roasted until meltingly sweet — squeeze onto cheese or stir into mash.',        time:'50 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=roasted+garlic' },
-      { icon:'🥣', name:'40-Clove Chicken',        desc:'Slow-roasted chicken with a whole head of garlic per portion, becoming sweet and spreadable.', time:'75 min', difficulty:'weekend', link:'https://www.bbcgoodfood.com/search?q=40+clove+garlic+chicken' },
+    mealPool: [
+      { icon:'🍝', name:'Spaghetti Aglio e Olio', desc:'Pasta with golden garlic slices, chilli flakes and good olive oil — Italian simplicity.', time:'15 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=spaghetti+aglio+olio' },
+      { icon:'🥖', name:'Garlic Bread', desc:'Proper homemade garlic butter with parsley slathered into a baguette and baked golden.', time:'20 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=homemade+garlic+bread' },
+      { icon:'🫕', name:'Roasted Garlic', desc:'Whole heads roasted until meltingly sweet — squeeze onto cheese or stir into mash.', time:'50 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=roasted+garlic' },
+      { icon:'🥣', name:'40-Clove Chicken', desc:'Slow-roasted chicken with a whole head of garlic per portion, becoming sweet and spreadable.', time:'75 min', difficulty:'weekend', seasons:['summer','autumn'], link:'https://www.bbcgoodfood.com/search?q=40+clove+garlic+chicken' },
+      { icon:'🧄', name:'Black Garlic Risotto', desc:'Fermented black garlic stirred through a creamy risotto for a deeply savoury depth.', time:'45 min', difficulty:'medium', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=black+garlic+risotto' },
+      { icon:'🥗', name:'Garlic Scape Pesto', desc:'If you grow hardneck garlic, use the scapes to make a vibrant green pesto.', time:'10 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=garlic+scape+pesto' },
+      { icon:'🍛', name:'Chicken with 20 Garlic Cloves', desc:'French bistro classic — chicken braised slowly with whole cloves until meltingly tender.', time:'90 min', difficulty:'medium', seasons:['summer','autumn'], link:'https://www.bbcgoodfood.com/search?q=chicken+garlic+cloves' },
+      { icon:'🥘', name:'Garlic Prawns', desc:'Shell-on prawns flash-fried in butter with garlic, chilli and white wine.', time:'10 min', difficulty:'easy', seasons:['summer'], link:'https://www.bbcgoodfood.com/search?q=garlic+prawns' },
+      { icon:'🍞', name:'Garlic Flatbreads', desc:'Quick yeasted flatbreads brushed with garlic butter and sea salt straight from the pan.', time:'30 min', difficulty:'easy', seasons:['any'], link:'https://www.bbcgoodfood.com/search?q=garlic+flatbreads' },
+      { icon:'🥙', name:'Garlic & Herb Labneh', desc:'Strained yoghurt with roasted garlic, herbs and olive oil — serve with warm pitta.', time:'20 min', difficulty:'easy', seasons:['summer','spring'], link:'https://www.bbcgoodfood.com/search?q=garlic+herb+labneh' },
     ]
   },
 ];
+
+
 
 // ═══════════════════════════════════════════════════════════
 // STATE
@@ -1284,6 +1504,56 @@ let currentMonth = (!isNaN(savedMonth) && savedMonth >= 0 && savedMonth <= 11)
   : new Date().getMonth();
 
 let searchQuery = '';
+let seasonalWeight = true; // toggle state
+
+// ─── selectMeals: pick 4 from mealPool with optional seasonal weighting ───────
+function selectMeals(veg) {
+  const pool = veg.mealPool;
+  if (pool.length <= 4) return [...pool];
+
+  const currentSeason = getSeason(currentMonth).key;
+
+  if (!seasonalWeight) {
+    // Pure random shuffle, pick first 4
+    const shuffled = [...pool].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, 4);
+  }
+
+  // Weighted: meals matching current season get weight 3, others get weight 1
+  const weighted = [];
+  pool.forEach(meal => {
+    const seasons = meal.seasons || ['any'];
+    const weight = (seasons.includes(currentSeason) || seasons.includes('any')) ? 3 : 1;
+    for (let i = 0; i < weight; i++) weighted.push(meal);
+  });
+
+  // Pick 4 unique meals from the weighted pool
+  const picked = [];
+  const seen = new Set();
+  // Shuffle weighted pool
+  for (let i = weighted.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [weighted[i], weighted[j]] = [weighted[j], weighted[i]];
+  }
+  for (const meal of weighted) {
+    if (!seen.has(meal.name)) {
+      seen.add(meal.name);
+      picked.push(meal);
+      if (picked.length === 4) break;
+    }
+  }
+  // Fallback: fill up from remaining if needed
+  if (picked.length < 4) {
+    for (const meal of pool) {
+      if (!seen.has(meal.name)) {
+        seen.add(meal.name);
+        picked.push(meal);
+        if (picked.length === 4) break;
+      }
+    }
+  }
+  return picked;
+}
 
 // Planner: { Mon: [{mealName, mealIcon, vegName},...], ... }
 const planner = {};
@@ -1388,49 +1658,62 @@ function buildMealsTab(veg) {
   panel.className = 'tab-panel';
   panel.dataset.panel = 'meals';
 
-  veg.meals.forEach(meal => {
-    const item = document.createElement('div');
-    item.className = 'meal-item';
+  function renderMeals() {
+    panel.innerHTML = '';
+    const meals = selectMeals(veg);
 
-    const icon = document.createElement('div');
-    icon.className = 'meal-icon';
-    icon.textContent = meal.icon;
+    meals.forEach(meal => {
+      const item = document.createElement('div');
+      item.className = 'meal-item';
 
-    const content = document.createElement('div');
-    content.className = 'meal-content';
+      const icon = document.createElement('div');
+      icon.className = 'meal-icon';
+      icon.textContent = meal.icon;
 
-    const nameRow = document.createElement('div');
-    nameRow.className = 'meal-name-row';
+      const content = document.createElement('div');
+      content.className = 'meal-content';
 
-    const name = document.createElement('span');
-    name.className = 'meal-name';
-    name.textContent = meal.name;
+      const nameRow = document.createElement('div');
+      nameRow.className = 'meal-name-row';
 
-    const badge = document.createElement('span');
-    badge.className = `difficulty-badge ${diffClass(meal.difficulty)}`;
-    badge.textContent = `${diffLabel(meal.difficulty)} · ${meal.time}`;
+      const name = document.createElement('span');
+      name.className = 'meal-name';
+      name.textContent = meal.name;
 
-    nameRow.appendChild(name);
-    nameRow.appendChild(badge);
+      const badge = document.createElement('span');
+      badge.className = `difficulty-badge ${diffClass(meal.difficulty)}`;
+      badge.textContent = `${diffLabel(meal.difficulty)} · ${meal.time}`;
 
-    const desc = document.createElement('div');
-    desc.className = 'meal-desc';
-    desc.textContent = meal.desc;
+      nameRow.appendChild(name);
+      nameRow.appendChild(badge);
 
-    const link = document.createElement('a');
-    link.className = 'meal-link';
-    link.href = meal.link;
-    link.target = '_blank';
-    link.rel = 'noopener';
-    link.textContent = '→ Find a recipe on BBC Good Food';
+      const desc = document.createElement('div');
+      desc.className = 'meal-desc';
+      desc.textContent = meal.desc;
 
-    content.appendChild(nameRow);
-    content.appendChild(desc);
-    content.appendChild(link);
-    item.appendChild(icon);
-    item.appendChild(content);
-    panel.appendChild(item);
-  });
+      const link = document.createElement('a');
+      link.className = 'meal-link';
+      link.href = meal.link;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = '→ Find a recipe on BBC Good Food';
+
+      content.appendChild(nameRow);
+      content.appendChild(desc);
+      content.appendChild(link);
+      item.appendChild(icon);
+      item.appendChild(content);
+      panel.appendChild(item);
+    });
+
+    const reshuffleBtn = document.createElement('button');
+    reshuffleBtn.className = 'reshuffle-btn';
+    reshuffleBtn.textContent = '🔀 Show different meals';
+    reshuffleBtn.addEventListener('click', renderMeals);
+    panel.appendChild(reshuffleBtn);
+  }
+
+  renderMeals();
   return panel;
 }
 
@@ -1558,7 +1841,7 @@ function renderVeg() {
     vegs = vegs.filter(v =>
       v.name.toLowerCase().includes(q) ||
       v.note.toLowerCase().includes(q) ||
-      v.meals.some(m => m.name.toLowerCase().includes(q))
+      v.mealPool.some(m => m.name.toLowerCase().includes(q))
     );
   }
 
@@ -1649,7 +1932,7 @@ function showMealStep(veg, sheet, overlay) {
   const list = document.createElement('div');
   list.className = 'meal-pick-list';
 
-  veg.meals.forEach(meal => {
+  veg.mealPool.forEach(meal => {
     const btn = document.createElement('button');
     btn.className = 'meal-pick-btn';
     btn.innerHTML = `
@@ -1806,7 +2089,7 @@ function renderPantryResults() {
     groupName.textContent = `${veg.emoji} ${veg.name}`;
     group.appendChild(groupName);
 
-    veg.meals.forEach(meal => {
+    veg.mealPool.forEach(meal => {
       const item = document.createElement('div');
       item.className = 'meal-item';
       item.innerHTML = `
@@ -1834,6 +2117,11 @@ function renderPantryResults() {
 
 document.getElementById('searchInput').addEventListener('input', e => {
   searchQuery = e.target.value.trim();
+  renderVeg();
+});
+
+document.getElementById('seasonToggle').addEventListener('change', e => {
+  seasonalWeight = e.target.checked;
   renderVeg();
 });
 
