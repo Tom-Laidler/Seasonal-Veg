@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Northern Roots — Seasonal Veg, North England</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --soil: #2c1a0e;
+    --bark: #4a2c17;
+    --moss: #4a5e3a;
+    --sage: #7a9068;
+    --cream: #f5efe0;
+    --straw: #e8d9b5;
+    --rust: #b5451b;
+    --amber: #d4891a;
+    --sky: #8fb3c8;
+    --leaf: #3d6b45;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--cream);
+    color: var(--soil);
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.6;
+  }
+
+  header {
+    background-color: var(--soil);
+    color: var(--cream);
+    padding: 3rem 2rem 2.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0; right: 0;
+    height: 40px;
+    background: var(--cream);
+    clip-path: ellipse(55% 100% at 50% 100%);
+  }
+
+  .header-eyebrow {
+    font-family: 'Lato', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 0.8rem;
+  }
+
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--straw);
+  }
+
+  header h1 em {
+    color: var(--amber);
+    font-style: italic;
+  }
+
+  .header-sub {
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    color: var(--sky);
+    margin-top: 0.7rem;
+  }
+
+  /* Decorative vines */
+  .vine-left, .vine-right {
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 80px;
+    opacity: 0.15;
+    pointer-events: none;
+  }
+  .vine-left { left: 0; }
+  .vine-right { right: 0; transform: scaleX(-1); }
+
+  /* Month selector */
+  .month-nav {
+    background: var(--bark);
+    padding: 0;
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0;
+    border-bottom: 3px solid var(--rust);
+  }
+  .month-nav::-webkit-scrollbar { display: none; }
+
+  .month-btn {
+    background: none;
+    border: none;
+    color: var(--straw);
+    font-family: 'Lato', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.9rem 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    white-space: nowrap;
+  }
+  .month-btn:hover { color: var(--amber); }
+  .month-btn.active {
+    color: var(--cream);
+    background: var(--rust);
+    font-weight: 700;
+  }
+  .month-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0; right: 0;
+    height: 3px;
+    background: var(--amber);
+  }
+
+  /* Season banner */
+  .season-banner {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .season-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--moss);
+    color: var(--cream);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 0.4rem 1.2rem;
+    border-radius: 2px;
+  }
+
+  .month-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 4vw, 2.5rem);
+    color: var(--bark);
+    font-weight: 400;
+  }
+
+  /* Main grid */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem 4rem;
+  }
+
+  .intro-text {
+    text-align: center;
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: var(--moss);
+    max-width: 600px;
+    margin: 0 auto 2.5rem;
+    padding: 0 1rem;
+  }
+
+  .veg-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .veg-card {
+    background: white;
+    border: 1px solid var(--straw);
+    border-radius: 4px;
+    overflow: hidden;
+    transition: transform 0.25s, box-shadow 0.25s;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .veg-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(44,26,14,0.12);
+  }
+
+  .veg-card.expanded {
+    grid-column: span 2;
+  }
+
+  @media (max-width: 640px) {
+    .veg-card.expanded { grid-column: span 1; }
+  }
+
+  .veg-emoji-banner {
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .veg-card-body {
+    padding: 1.2rem 1.4rem;
+    border-top: 2px solid var(--straw);
+  }
+
+  .veg-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--bark);
+    margin-bottom: 0.2rem;
+  }
+
+  .veg-latin {
+    font-size: 0.75rem;
+    font-style: italic;
+    color: var(--sage);
+    margin-bottom: 0.8rem;
+  }
+
+  .veg-note {
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 1rem;
+  }
+
+  .peak-tag {
+    display: inline-block;
+    background: var(--amber);
+    color: white;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border-radius: 2px;
+    margin-bottom: 0.8rem;
+  }
+
+  .meals-toggle {
+    background: var(--moss);
+    color: var(--cream);
+    border: none;
+    font-family: 'Lato', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.55rem 1rem;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s;
+    border-radius: 2px;
+  }
+  .meals-toggle:hover { background: var(--leaf); }
+
+  .meals-panel {
+    display: none;
+    padding: 1rem 1.4rem 1.4rem;
+    background: #f9f5ed;
+    border-top: 1px dashed var(--straw);
+    animation: slideDown 0.25s ease;
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .meals-panel.open { display: block; }
+
+  .meals-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.9rem;
+    font-style: italic;
+    color: var(--bark);
+    margin-bottom: 0.7rem;
+  }
+
+  .meal-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--straw);
+  }
+  .meal-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+  .meal-icon { font-size: 1.3rem; flex-shrink: 0; }
+
+  .meal-name {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--bark);
+    margin-bottom: 0.15rem;
+  }
+  .meal-desc {
+    font-size: 0.78rem;
+    color: #666;
+    line-height: 1.5;
+  }
+
+  /* No veg message */
+  .no-veg {
+    text-align: center;
+    padding: 4rem 2rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-style: italic;
+    color: var(--sage);
+    grid-column: 1/-1;
+  }
+
+  /* Footer */
+  footer {
+    background: var(--soil);
+    color: var(--sage);
+    text-align: center;
+    padding: 2rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+  }
+
+  /* Share button */
+  .share-bar {
+    background: var(--straw);
+    border-bottom: 1px solid #ddd;
+    padding: 0.6rem 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .share-btn {
+    background: var(--rust);
+    color: white;
+    border: none;
+    font-family: 'Lato', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.45rem 1.1rem;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .share-btn:hover { background: var(--bark); }
+  .share-msg {
+    font-size: 0.75rem;
+    color: var(--leaf);
+    display: none;
+  }
+  .share-msg.show { display: inline; }
+
+  /* Season colour accents on emoji banners */
+  .season-spring .veg-emoji-banner { background: linear-gradient(135deg, #d4f0c0 0%, #e8f5d0 100%); }
+  .season-summer .veg-emoji-banner { background: linear-gradient(135deg, #fff4cc 0%, #ffe8a0 100%); }
+  .season-autumn .veg-emoji-banner { background: linear-gradient(135deg, #f5deb3 0%, #e8c87a 100%); }
+  .season-winter .veg-emoji-banner { background: linear-gradient(135deg, #d0e8f5 0%, #b8d8ee 100%); }
+  .season-yearround .veg-emoji-banner { background: linear-gradient(135deg, #e8e0f5 0%, #d0c8e8 100%); }
+
+  @media (max-width: 500px) {
+    .month-btn { padding: 0.7rem 0.7rem; font-size: 0.65rem; }
+    .veg-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <svg class="vine-left" viewBox="0 0 80 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M40 0 Q20 50 40 100 Q60 150 30 200 Q10 250 40 300 Q60 350 30 400" stroke="white" stroke-width="3" fill="none"/>
+    <circle cx="55" cy="80" r="12" fill="white"/>
+    <circle cx="25" cy="170" r="10" fill="white"/>
+    <circle cx="55" cy="260" r="14" fill="white"/>
+    <circle cx="20" cy="340" r="9" fill="white"/>
+  </svg>
+  <svg class="vine-right" viewBox="0 0 80 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M40 0 Q20 50 40 100 Q60 150 30 200 Q10 250 40 300 Q60 350 30 400" stroke="white" stroke-width="3" fill="none"/>
+    <circle cx="55" cy="80" r="12" fill="white"/>
+    <circle cx="25" cy="170" r="10" fill="white"/>
+    <circle cx="55" cy="260" r="14" fill="white"/>
+    <circle cx="20" cy="340" r="9" fill="white"/>
+  </svg>
+  <div class="header-eyebrow">🌿 From the Allotment to Your Table</div>
+  <h1>Northern <em>Roots</em></h1>
+  <div class="header-sub">Yorkshire · Lancashire · Cumbria · Durham · Northumberland · Cleveland</div>
+</header>
+
+<div class="share-bar">
+  <span class="share-msg" id="shareMsg">Link copied! 🎉</span>
+  <button class="share-btn" onclick="shareApp()">📋 Share this App</button>
+</div>
+
+<nav class="month-nav" id="monthNav"></nav>
+
+<div class="season-banner">
+  <div class="season-badge" id="seasonBadge">🌱 Season</div>
+  <div class="month-headline" id="monthHeadline">Loading…</div>
+</div>
+
+<div class="container">
+  <p class="intro-text" id="introText"></p>
+  <div class="veg-grid" id="vegGrid"></div>
+</div>
+
+<footer>
+  Northern Roots &mdash; Celebrating the seasonal harvest of Yorkshire, Lancashire, Cumbria, County Durham, Northumberland &amp; Cleveland
+</footer>
+
+<script>
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+const SEASON_INFO = {
+  winter: { label: '❄️ Winter', months: [0,1,11] },
+  spring: { label: '🌱 Spring', months: [2,3,4] },
+  summer: { label: '☀️ Summer', months: [5,6,7] },
+  autumn: { label: '🍂 Autumn', months: [8,9,10] },
+};
+
+const MONTH_INTROS = [
+  "January is the heart of winter across the North — from the Cumbrian fells to the Cleveland Hills, root cellars come into their own and hardy brassicas stand proud in the frost.",
+  "February stays cold from Northumberland to Lancashire, but the first stirrings of spring are near — storage veg and leeks carry us through the final grey weeks across Cleveland and beyond.",
+  "March bridges winter and spring across the region. Purple sprouting broccoli is the star of northern kitchens this month, cropping even in the cooler Northumberland and Cleveland air.",
+  "April brings tentative warmth to the Tyne, Tees and Cleveland valleys. Spring onions push through, and overwintered greens reach their peak from Durham to the Yorkshire Dales.",
+  "May is the 'hungry gap' — an exciting bridge between seasons. Asparagus and spinach herald better things across every northern county, from Cleveland to Cumbria.",
+  "June bursts into life. The long northern days give peas, broad beans and courgettes their best start — even in Cumbria, Northumberland and the Cleveland Hills.",
+  "July is summer abundance — runner beans, courgettes and salad leaves love the generous light of the northern summer, from the Eden Valley to the Cleveland coast.",
+  "August is peak harvest from the Scottish borders down through Cleveland to South Yorkshire — sweetcorn, French beans, beetroot and tomatoes all at their finest.",
+  "September is the crown jewel of the northern growing year. Everything ripens before the cold returns, whether you're on the Northumberland coast, the Cleveland Hills or the Lancashire plain.",
+  "October brings squash, root veg and the first frosts that sweep down from the fells and across the Cleveland moors — sweetening Brussels sprouts on the stalk across the whole region.",
+  "November strips the garden back across Northumberland, Cleveland and County Durham — but kale, parsnips and leeks step forward to carry the table through the dark months.",
+  "December returns us to roots — parsnips sweeter for the frost from the Lake District to the Cleveland Hills, and sprouts ready for the festive table.",
+];
+
+function getSeason(m) {
+  for (const [s, info] of Object.entries(SEASON_INFO)) {
+    if (info.months.includes(m)) return { key: s, label: info.label };
+  }
+  return { key: 'winter', label: '❄️ Winter' };
+}
+
+// Full vegetable database
+const VEG = [
+  {
+    name: 'Leek', latin: 'Allium ampeloprasum', emoji: '🌿',
+    months: [0,1,2,3,10,11],
+    peak: [11,0,1,2],
+    season: 'winter',
+    note: 'The leek is the backbone of the northern winter kitchen. Hardy in frost, mild and sweet when slow-cooked.',
+    meals: [
+      { icon: '🥣', name: 'Leek & Potato Soup', desc: 'A northern classic. Slow-cook leeks in butter, add floury potatoes and stock, blend until silky.' },
+      { icon: '🥧', name: 'Leek & Cheese Tart', desc: 'Softened leeks in a shortcrust pastry case with mature cheddar and a cream & egg custard.' },
+      { icon: '🍗', name: 'Cock-a-Leekie', desc: 'Traditional Scottish-influenced broth with chicken, leeks, barley and a handful of prunes.' },
+      { icon: '🥘', name: 'Leek & Mushroom Risotto', desc: 'Northern twist on an Italian staple — leeks braised down into the rice base with wild mushrooms.' },
+    ]
+  },
+  {
+    name: 'Kale', latin: 'Brassica oleracea var. sabellica', emoji: '🥬',
+    months: [0,1,2,10,11],
+    peak: [11,0,1],
+    season: 'winter',
+    note: 'Frost-sweetened kale is a North England staple. Curly varieties grow happily in Yorkshire and Cumbria.',
+    meals: [
+      { icon: '🥣', name: 'Kale & White Bean Soup', desc: 'Tuscan-style ribollita adapted for the North — kale, cannellini beans, cavolo nero and crusty bread.' },
+      { icon: '🍳', name: 'Kale & Egg Hash', desc: 'Wilted kale with crispy potatoes, topped with fried eggs and a splash of hot sauce.' },
+      { icon: '🥗', name: 'Warm Kale & Grain Salad', desc: 'Massaged kale with pearl barley, roasted squash and a mustard dressing.' },
+      { icon: '🥙', name: 'Colcannon', desc: 'Irish-inspired mash blended with wilted kale, butter and spring onions — winter comfort at its best.' },
+    ]
+  },
+  {
+    name: 'Parsnip', latin: 'Pastinaca sativa', emoji: '🥕',
+    months: [0,1,10,11],
+    peak: [11,0,1],
+    season: 'winter',
+    note: 'Frost makes parsnips sweeter — the first hard frost of autumn converts their starch to sugars. A northern roast essential.',
+    meals: [
+      { icon: '🍗', name: 'Honey-Roasted Parsnips', desc: 'Tossed in honey and thyme, roasted until caramelised and deeply nutty.' },
+      { icon: '🥣', name: 'Curried Parsnip Soup', desc: 'Blended with onions, ginger, cumin and vegetable stock — a warming bowl for a grey day.' },
+      { icon: '🥘', name: 'Parsnip & Blue Cheese Gratin', desc: 'Thinly sliced parsnips baked in cream with crumbled Yorkshire blue cheese.' },
+      { icon: '🫕', name: 'Lancashire Hotpot', desc: 'Add parsnips to the classic — layered with lamb, onions and topped with potato.' },
+    ]
+  },
+  {
+    name: 'Brussels Sprouts', latin: 'Brassica oleracea var. gemmifera', emoji: '🥦',
+    months: [0,10,11],
+    peak: [11,0],
+    season: 'winter',
+    note: 'Controversial but glorious when cooked right. A firm frost on the stalk sweetens them beautifully.',
+    meals: [
+      { icon: '🥓', name: 'Sprouts with Bacon & Chestnuts', desc: 'Pan-fried in butter with crispy smoked bacon and roasted chestnuts — the festive classic.' },
+      { icon: '🍳', name: 'Bubble & Squeak Patties', desc: 'Leftover sprouts and mash fried into crispy patties — Boxing Day staple.' },
+      { icon: '🥗', name: 'Shredded Sprout Salad', desc: 'Raw sprouts finely sliced with apple, walnuts and a cider vinegar dressing.' },
+      { icon: '🧀', name: 'Cheesy Sprout Bake', desc: 'Blanched sprouts in a rich mornay sauce, topped with golden breadcrumbs.' },
+    ]
+  },
+  {
+    name: 'Purple Sprouting Broccoli', latin: 'Brassica oleracea var. italica', emoji: '🫛',
+    months: [1,2,3],
+    peak: [2,3],
+    season: 'spring',
+    note: 'One of the most eagerly awaited crops in the northern garden — tiny purple florets signal the end of winter.',
+    meals: [
+      { icon: '🍝', name: 'PSB with Pasta & Anchovy', desc: 'Blanched PSB tossed with spaghetti, anchovy-chilli butter and toasted breadcrumbs.' },
+      { icon: '🥚', name: 'PSB with Soft-boiled Eggs', desc: 'Simple and elegant — steamed PSB with runny eggs, hollandaise or lemony yoghurt sauce.' },
+      { icon: '🫕', name: 'PSB & Stilton Tart', desc: 'Tender PSB in a quiche-style tart with crumbled Stilton and caramelised onions.' },
+      { icon: '🥘', name: 'PSB Stir-fry with Sesame', desc: 'Quick-fried with garlic, ginger, soy and a drizzle of sesame oil.' },
+    ]
+  },
+  {
+    name: 'Spring Onion', latin: 'Allium fistulosum', emoji: '🌱',
+    months: [3,4,5,6,7,8],
+    peak: [4,5,6],
+    season: 'spring',
+    note: 'Hardy and quick-growing, spring onions add freshness to everything. Easy to grow even in northern clay soils.',
+    meals: [
+      { icon: '🥞', name: 'Spring Onion Pancakes', desc: 'Chinese-inspired crispy flatbreads folded with sliced spring onions and sesame oil.' },
+      { icon: '🥗', name: 'Spring Salad', desc: 'Shaved spring onions with radishes, peas and a cider vinegar vinaigrette.' },
+      { icon: '🍜', name: 'Spring Onion Ramen', desc: 'Quick broth with noodles topped with soft-boiled egg, sesame and plenty of sliced spring onions.' },
+      { icon: '🍳', name: 'Potato & Spring Onion Frittata', desc: 'Thick Italian-style omelette with cooked new potatoes and a generous bunch of spring onions.' },
+    ]
+  },
+  {
+    name: 'Asparagus', latin: 'Asparagus officinalis', emoji: '🌿',
+    months: [4,5],
+    peak: [4,5],
+    season: 'spring',
+    note: 'A fleeting but glorious crop — the short northern season runs May to June. Worth the wait every single year.',
+    meals: [
+      { icon: '🥚', name: 'Asparagus with Soft Eggs', desc: 'Blanched spears with runny soft-boiled eggs and shaved Parmesan — elegant simplicity.' },
+      { icon: '🍳', name: 'Asparagus Omelette', desc: 'Lightly cooked tips folded into a buttery French omelette with goat\'s cheese.' },
+      { icon: '🍝', name: 'Asparagus & Lemon Pasta', desc: 'Shaved asparagus with tagliatelle, cream, lemon zest and toasted pine nuts.' },
+      { icon: '🍕', name: 'Asparagus Tart', desc: 'Puff pastry base with crème fraîche, asparagus spears, ham and soft-boiled quail eggs.' },
+    ]
+  },
+  {
+    name: 'Spinach', latin: 'Spinacia oleracea', emoji: '🥬',
+    months: [4,5,6,7,8,9],
+    peak: [5,6,7],
+    season: 'spring',
+    note: 'Grows prolifically in the cool, moist northern summers. Bolt-resistant varieties do especially well.',
+    meals: [
+      { icon: '🍛', name: 'Saag Aloo', desc: 'Classic North Indian spinach and potato curry — comforting, earthy and deeply spiced.' },
+      { icon: '🥬', name: 'Wilted Spinach & Garlic', desc: 'The simplest side — just butter, garlic and good-quality young spinach leaves.' },
+      { icon: '🥧', name: 'Spinach & Ricotta Cannelloni', desc: 'Tubes of pasta filled with spinach and ricotta, baked in a rich tomato sauce.' },
+      { icon: '🍳', name: 'Florentine Eggs', desc: 'Poached eggs on a bed of creamed spinach, finished with hollandaise sauce.' },
+    ]
+  },
+  {
+    name: 'Broad Bean', latin: 'Vicia faba', emoji: '🫘',
+    months: [5,6,7],
+    peak: [6,7],
+    season: 'summer',
+    note: 'A northern garden favourite — overwinter beans planted in autumn crop earliest. Double-pod for the sweetest taste.',
+    meals: [
+      { icon: '🥙', name: 'Broad Bean Bruschetta', desc: 'Crushed broad beans with mint, lemon and ricotta on sourdough toast.' },
+      { icon: '🫕', name: 'Broad Bean & Pancetta Risotto', desc: 'Creamy risotto with double-podded broad beans and crispy pancetta.' },
+      { icon: '🥗', name: 'Broad Bean & Feta Salad', desc: 'Simple summer salad with lemon, mint and crumbled feta over podded beans.' },
+      { icon: '🍝', name: 'Broad Bean Pasta', desc: 'Linguine with broad beans, peas, courgette ribbons and a light cream sauce.' },
+    ]
+  },
+  {
+    name: 'Pea', latin: 'Pisum sativum', emoji: '🫛',
+    months: [5,6,7,8],
+    peak: [6,7],
+    season: 'summer',
+    note: 'There\'s nothing better than fresh northern peas picked straight from the pod on a warm Dales morning.',
+    meals: [
+      { icon: '🥣', name: 'Minted Pea Soup', desc: 'Simple, vibrant blended soup with fresh mint, a touch of crème fraîche and warm bread.' },
+      { icon: '🍛', name: 'Pea & Mint Risotto', desc: 'Blended pea and fresh mint stirred into creamy arborio rice.' },
+      { icon: '🥗', name: 'Pea & Ham Salad', desc: 'Yorkshire ham hock shredded over fresh peas, Little Gem and a mustardy dressing.' },
+      { icon: '🫕', name: 'Mushy Peas', desc: 'The northern classic — dried marrowfat peas simmered down with mint and a pinch of bicarbonate.' },
+    ]
+  },
+  {
+    name: 'Courgette', latin: 'Cucurbita pepo', emoji: '🥒',
+    months: [6,7,8,9],
+    peak: [7,8],
+    season: 'summer',
+    note: 'Prolific and versatile — one plant produces all summer long. Perfect for the northern polytunnel.',
+    meals: [
+      { icon: '🍕', name: 'Courgette & Goat\'s Cheese Pizza', desc: 'Shaved courgette with crumbled goat\'s cheese and lemon zest on a thin crust.' },
+      { icon: '🥞', name: 'Courgette Fritters', desc: 'Grated courgette fritters with feta and mint, served with cool yoghurt dip.' },
+      { icon: '🫕', name: 'Stuffed Courgettes', desc: 'Halved and filled with herby rice, tomato and pine nuts, baked until tender.' },
+      { icon: '🍝', name: 'Courgette Carbonara', desc: 'Ribboned courgette added to classic carbonara for a summer twist.' },
+    ]
+  },
+  {
+    name: 'Runner Bean', latin: 'Phaseolus coccineus', emoji: '🫘',
+    months: [7,8,9],
+    peak: [7,8],
+    season: 'summer',
+    note: 'The runner bean is the great northern cottage garden crop — bright red flowers and pods that keep on giving.',
+    meals: [
+      { icon: '🍲', name: 'Runner Bean Minestrone', desc: 'Classic Italian soup given a northern makeover with runner beans, tomatoes and barley.' },
+      { icon: '🥘', name: 'Runner Bean Chutney', desc: 'A northern allotment tradition — preserve the glut in a sweet and tangy chutney.' },
+      { icon: '🥗', name: 'Bean & Tomato Salad', desc: 'Blanched runner beans with cherry tomatoes, basil and a red wine vinaigrette.' },
+      { icon: '🥩', name: 'Runner Beans with Lamb', desc: 'Slow-braised shoulder of lamb with runner beans and rosemary-garlic gravy.' },
+    ]
+  },
+  {
+    name: 'Sweetcorn', latin: 'Zea mays', emoji: '🌽',
+    months: [7,8,9],
+    peak: [8],
+    season: 'summer',
+    note: 'Northern varieties need the warmest spots — south-facing walls and polytunnels ripen cobs perfectly by August.',
+    meals: [
+      { icon: '🔥', name: 'Chargrilled Corn on the Cob', desc: 'Blackened on a griddle or BBQ, slathered with chilli butter and lime.' },
+      { icon: '🌮', name: 'Sweetcorn Salsa', desc: 'Charred corn with red onion, jalapeño, coriander and lime — perfect with fish tacos.' },
+      { icon: '🥣', name: 'Corn Chowder', desc: 'Creamy soup with sweetcorn, potatoes, smoked haddock and a dill garnish.' },
+      { icon: '🥞', name: 'Sweetcorn Fritters', desc: 'Crispy corn fritters with spring onions, chilli and a soured cream dip.' },
+    ]
+  },
+  {
+    name: 'Beetroot', latin: 'Beta vulgaris', emoji: '🟣',
+    months: [6,7,8,9,10],
+    peak: [7,8,9],
+    season: 'summer',
+    note: 'Vibrant and earthy — grows brilliantly across the north. Eat the tops too: they\'re superb wilted like chard.',
+    meals: [
+      { icon: '🥗', name: 'Roasted Beet & Feta Salad', desc: 'Wedges of roasted beetroot with walnuts, crumbled feta and rocket.' },
+      { icon: '🥣', name: 'Borscht', desc: 'Eastern European beet soup with cabbage, soured cream and rye bread.' },
+      { icon: '🍔', name: 'Beetroot Burger', desc: 'Deep purple patties made with beetroot, black beans and oats, served in a brioche bun.' },
+      { icon: '🍰', name: 'Chocolate Beetroot Cake', desc: 'Moist, fudgy cake that uses grated raw beetroot for incredible richness.' },
+    ]
+  },
+  {
+    name: 'Tomato', latin: 'Solanum lycopersicum', emoji: '🍅',
+    months: [7,8,9],
+    peak: [8,9],
+    season: 'summer',
+    note: 'Best grown in northern polytunnels or greenhouses. Worth every bit of effort — the flavour is incomparable to shop-bought.',
+    meals: [
+      { icon: '🥗', name: 'Caprese Salad', desc: 'Thick-sliced tomatoes with buffalo mozzarella, basil and the best olive oil you own.' },
+      { icon: '🍝', name: 'Fresh Tomato Pasta', desc: 'Crushed fresh tomatoes tossed with garlic, basil and linguine — 15 minutes of summer.' },
+      { icon: '🫙', name: 'Tomato Chutney', desc: 'A northern allotment essential — end-of-season glut turned into rich, spiced chutney.' },
+      { icon: '🥪', name: 'Tomato on Toast', desc: 'Pan con tomate style — ripe tomatoes grated onto sourdough with garlic and sea salt.' },
+    ]
+  },
+  {
+    name: 'Squash', latin: 'Cucurbita maxima', emoji: '🎃',
+    months: [9,10,11],
+    peak: [9,10],
+    season: 'autumn',
+    note: 'Autumn squash store brilliantly and thrive in northern growing conditions — Crown Prince and Butternut are favourites.',
+    meals: [
+      { icon: '🥣', name: 'Roasted Squash Soup', desc: 'Halved squash roasted until caramelised, blended with ginger, coconut milk and chilli.' },
+      { icon: '🥘', name: 'Squash & Sage Risotto', desc: 'Roasted squash stirred into a saffron-tinged risotto with crispy fried sage leaves.' },
+      { icon: '🌮', name: 'Squash & Black Bean Tacos', desc: 'Spiced roasted squash with chipotle, black beans and pickled onions in warm tortillas.' },
+      { icon: '🍛', name: 'Thai Squash Curry', desc: 'Butternut squash simmered in a fragrant Thai green paste with coconut milk and lime.' },
+    ]
+  },
+  {
+    name: 'Carrot', latin: 'Daucus carota', emoji: '🥕',
+    months: [6,7,8,9,10,11,0,1],
+    peak: [8,9,10],
+    season: 'autumn',
+    note: 'The sandy soils of coastal Lancashire and Yorkshire grow superb long carrots. Frost-sweet in autumn.',
+    meals: [
+      { icon: '🥣', name: 'Carrot & Coriander Soup', desc: 'Blended with onion, roasted coriander seeds and a squeeze of orange — a warming classic.' },
+      { icon: '🥩', name: 'Glazed Roast Carrots', desc: 'Tossed with honey, thyme and butter, roasted until deeply caramelised.' },
+      { icon: '🍰', name: 'Carrot Cake', desc: 'Moist and warmly spiced, with cream cheese frosting and toasted walnut topping.' },
+      { icon: '🫕', name: 'Carrot & Lentil Dahl', desc: 'Warming, fragrant dahl with grated carrots, red lentils and coconut cream.' },
+    ]
+  },
+  {
+    name: 'Turnip', latin: 'Brassica rapa', emoji: '🟤',
+    months: [0,1,2,9,10,11],
+    peak: [10,11,0],
+    season: 'winter',
+    note: 'The humble turnip has long fed both people and livestock across Northumberland and Durham. Hardy, frost-tolerant and deeply underrated in the kitchen.',
+    meals: [
+      { icon: '🥣', name: 'Turnip & Lentil Soup', desc: 'Diced turnip simmered with red lentils, onion and cumin — earthy and deeply warming.' },
+      { icon: '🫕', name: 'Northumberland Stew', desc: 'Slow-cooked with shin beef, swede, carrot and turnip in a dark, herb-rich gravy.' },
+      { icon: '🥘', name: 'Roasted Turnips with Honey', desc: 'Cubed and roasted with honey and thyme until caramelised and sweet.' },
+      { icon: '🥔', name: 'Turnip Mash', desc: 'Mashed with butter and black pepper — a brilliant partner for venison sausages.' },
+    ]
+  },
+  {
+    name: 'Swede', latin: 'Brassica napus var. napobrassica', emoji: '🟠',
+    months: [0,1,2,9,10,11],
+    peak: [10,11,0],
+    season: 'winter',
+    note: 'Called "neep" in Northumberland and Cumbria, swede is the great unsung vegetable of the north — sweeter than turnip, brilliant in any slow-cooked dish.',
+    meals: [
+      { icon: '🥩', name: 'Haggis, Neeps & Tatties', desc: 'The classic Burns Night combination — swede mashed with butter alongside haggis and fluffy potato.' },
+      { icon: '🥣', name: 'Swede & Smoked Bacon Soup', desc: 'Roasted swede blended with chicken stock and crispy smoked Northumberland bacon on top.' },
+      { icon: '🫕', name: 'Swede & Lamb Hotpot', desc: 'A northern hotpot variant with diced swede layered beneath the potato crust with lamb.' },
+      { icon: '🥕', name: 'Swede Dauphinoise', desc: 'Thinly sliced swede baked in cream and garlic — an earthy, robust alternative to potato gratin.' },
+    ]
+  },
+  {
+    name: 'Chard', latin: 'Beta vulgaris subsp. cicla', emoji: '🌿',
+    months: [5,6,7,8,9,10],
+    peak: [6,7,8,9],
+    season: 'summer',
+    note: 'Rainbow chard and Swiss chard both flourish in the sheltered valleys of Cumbria and Durham. Colourful, hardy and productive all the way to first frosts.',
+    meals: [
+      { icon: '🍳', name: 'Chard & Egg Bake', desc: 'Wilted chard with eggs cracked on top, finished under the grill with cheese and chilli.' },
+      { icon: '🥘', name: 'Chard & Chickpea Stew', desc: 'North African–spiced chickpeas with tumbled chard leaves and harissa yoghurt.' },
+      { icon: '🫕', name: 'Chard & Ricotta Gnudi', desc: 'Pillowy ricotta dumplings with wilted chard, brown butter and sage — simple elegance.' },
+      { icon: '🍝', name: 'Chard Stem Gratin', desc: "Don't waste the stalks — bake them in a white sauce with gruyère until golden." },
+    ]
+  },
+  {
+    name: 'Jerusalem Artichoke', latin: 'Helianthus tuberosus', emoji: '🌰',
+    months: [0,1,10,11],
+    peak: [11,0,1],
+    season: 'winter',
+    note: "Grows like a weed across Northumberland and Durham allotments — once you plant them, you'll never be without them. Sweet, nutty and wonderfully versatile.",
+    meals: [
+      { icon: '🥣', name: 'Jerusalem Artichoke Soup', desc: 'Silky, nutty bisque with a swirl of truffle oil and toasted hazelnuts — proper winter luxury.' },
+      { icon: '🥘', name: 'Roasted Artichokes with Garlic', desc: 'Halved and roasted with whole garlic cloves, thyme and a splash of white wine.' },
+      { icon: '🍕', name: 'Artichoke & Mushroom Tart', desc: 'Thinly sliced artichokes on a puff pastry base with wild mushrooms and Taleggio.' },
+      { icon: '🥗', name: 'Raw Artichoke Salad', desc: 'Paper-thin raw slices with lemon, parmesan, rocket and toasted pine nuts.' },
+    ]
+  },
+  {
+    name: 'Potato', latin: 'Solanum tuberosum', emoji: '🥔',
+    months: [0,1,2,3,4,5,6,7,8,9,10,11],
+    peak: [6,7,8,9,10],
+    season: 'yearround',
+    note: 'The foundation of northern cooking. Maris Pipers, King Edwards and Charlottes all thrive in northern soils.',
+    meals: [
+      { icon: '🥘', name: 'Proper Chips', desc: 'Triple-cooked in dripping or beef fat — the northern chip shop is unmatched.' },
+      { icon: '🫕', name: 'Lancashire Hotpot', desc: 'Slow-braised lamb neck with onions, topped with a crown of thinly sliced golden potato.' },
+      { icon: '🥔', name: 'Baked Potato Bar', desc: 'Enormous floury baked potatoes with toppings: baked beans, cheese, coleslaw, pulled pork.' },
+      { icon: '🥗', name: 'New Potato Salad', desc: 'Waxy new potatoes dressed while warm with vinegar, mustard and spring onions.' },
+    ]
+  },
+  {
+    name: 'Onion', latin: 'Allium cepa', emoji: '🧅',
+    months: [0,1,2,3,4,5,6,7,8,9,10,11],
+    peak: [7,8,9],
+    season: 'yearround',
+    note: 'Onions store all winter after a summer harvest — the base of virtually every northern dish worth cooking.',
+    meals: [
+      { icon: '🥣', name: 'French Onion Soup', desc: 'Slowly caramelised onions in a rich beef broth, topped with Gruyère-melted croutons.' },
+      { icon: '🥧', name: 'Caramelised Onion Tart', desc: 'Sweet onions in a buttery pastry case with thyme, Gruyère and a touch of balsamic.' },
+      { icon: '🍔', name: 'Pickled Onions', desc: 'A northern pub staple — vinegar-sharp pickled onions perfect with a ploughman\'s.' },
+      { icon: '🫕', name: 'Onion Gravy', desc: 'Slow-cooked onions deglazed with ale and beef stock — transformative on sausage and mash.' },
+    ]
+  },
+  {
+    name: 'Garlic', latin: 'Allium sativum', emoji: '🧄',
+    months: [5,6,7,8],
+    peak: [6,7],
+    season: 'summer',
+    note: 'Planted in October, harvested in July — northern gardeners are discovering how well British garlic grows.',
+    meals: [
+      { icon: '🍝', name: 'Spaghetti Aglio e Olio', desc: 'Pasta with golden garlic slices, chilli flakes and good olive oil — Italian simplicity.' },
+      { icon: '🥖', name: 'Garlic Bread', desc: 'Proper homemade garlic butter with parsley slathered into a baguette and baked golden.' },
+      { icon: '🫕', name: 'Roasted Garlic', desc: 'Whole heads roasted until meltingly sweet — squeeze onto cheese or stir into mash.' },
+      { icon: '🥣', name: '40-Clove Chicken', desc: 'Slow-roasted chicken with a whole head of garlic per portion, becoming sweet and spreadable.' },
+    ]
+  },
+];
+
+function getVegForMonth(m) {
+  return VEG.filter(v => v.months.includes(m));
+}
+
+function isPeak(veg, m) {
+  return veg.peak.includes(m);
+}
+
+let currentMonth = new Date().getMonth();
+let openCards = new Set();
+
+function buildMonthNav() {
+  const nav = document.getElementById('monthNav');
+  MONTHS.forEach((name, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'month-btn' + (i === currentMonth ? ' active' : '');
+    btn.textContent = name.slice(0,3);
+    btn.onclick = () => selectMonth(i);
+    nav.appendChild(btn);
+  });
+}
+
+function selectMonth(m) {
+  currentMonth = m;
+  openCards.clear();
+  document.querySelectorAll('.month-btn').forEach((b, i) => {
+    b.classList.toggle('active', i === m);
+  });
+  renderVeg();
+  updateHeader();
+}
+
+function updateHeader() {
+  const m = currentMonth;
+  const { label } = getSeason(m);
+  document.getElementById('seasonBadge').textContent = label;
+  document.getElementById('monthHeadline').textContent = MONTHS[m] + ' in the North';
+  document.getElementById('introText').textContent = MONTH_INTROS[m];
+}
+
+function renderVeg() {
+  const grid = document.getElementById('vegGrid');
+  grid.innerHTML = '';
+  const vegs = getVegForMonth(currentMonth);
+  if (vegs.length === 0) {
+    grid.innerHTML = '<div class="no-veg">Nothing in season just now — time to browse the seed catalogues.</div>';
+    return;
+  }
+  vegs.forEach(veg => {
+    const peak = isPeak(veg, currentMonth);
+    const card = document.createElement('div');
+    card.className = `veg-card season-${veg.season}`;
+    const open = openCards.has(veg.name);
+    card.innerHTML = `
+      <div class="veg-emoji-banner">${veg.emoji}</div>
+      <div class="veg-card-body">
+        ${peak ? '<span class="peak-tag">✦ Peak Season</span>' : ''}
+        <div class="veg-name">${veg.name}</div>
+        <div class="veg-latin">${veg.latin}</div>
+        <div class="veg-note">${veg.note}</div>
+        <button class="meals-toggle" onclick="toggleMeals('${veg.name}', this)">
+          ${open ? '▲ Hide Meal Ideas' : '▼ Show Meal Ideas (${veg.meals.length})'}
+        </button>
+      </div>
+      <div class="meals-panel${open ? ' open' : ''}" id="meals-${veg.name.replace(/\s/g,'_')}">
+        <div class="meals-title">What to cook with ${veg.name}:</div>
+        ${veg.meals.map(m => `
+          <div class="meal-item">
+            <div class="meal-icon">${m.icon}</div>
+            <div>
+              <div class="meal-name">${m.name}</div>
+              <div class="meal-desc">${m.desc}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    // fix the button text after rendering
+    card.querySelector('.meals-toggle').textContent = open
+      ? '▲ Hide Meal Ideas'
+      : `▼ Show Meal Ideas (${veg.meals.length})`;
+    grid.appendChild(card);
+  });
+}
+
+function toggleMeals(vegName, btn) {
+  const id = 'meals-' + vegName.replace(/\s/g,'_');
+  const panel = document.getElementById(id);
+  const isOpen = panel.classList.toggle('open');
+  if (isOpen) {
+    openCards.add(vegName);
+    btn.textContent = '▲ Hide Meal Ideas';
+  } else {
+    openCards.delete(vegName);
+    const veg = VEG.find(v => v.name === vegName);
+    btn.textContent = `▼ Show Meal Ideas (${veg.meals.length})`;
+  }
+}
+
+function shareApp() {
+  const url = window.location.href;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => {
+      const msg = document.getElementById('shareMsg');
+      msg.classList.add('show');
+      setTimeout(() => msg.classList.remove('show'), 3000);
+    });
+  } else {
+    prompt('Copy this link:', url);
+  }
+}
+
+// Init
+buildMonthNav();
+updateHeader();
+renderVeg();
+</script>
+</body>
+</html>
