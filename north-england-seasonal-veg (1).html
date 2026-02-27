@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Northern Roots — Seasonal Veg, North England</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+
+/* ═══════════════════════════════════════════════════════════
+   CUSTOM PROPERTIES — overridden per month by JS
+══════════════════════════════════════════════════════════════ */
+:root {
+  --soil:  #2c1a0e;
+  --bark:  #4a2c17;
+  --moss:  #4a5e3a;
+  --sage:  #7a9068;
+  --cream: #f5efe0;
+  --straw: #e8d9b5;
+  --rust:  #b5451b;
+  --amber: #d4891a;
+  --sky:   #8fb3c8;
+  --leaf:  #3d6b45;
+
+  /* Seasonal vars */
+  --s-bg:     #f5efe0;
+  --s-header: #2c1a0e;
+  --s-accent: #d4891a;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESET & BASE
+══════════════════════════════════════════════════════════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background-color: var(--s-bg);
+  color: var(--soil);
+  font-family: 'Lato', sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background-color 0.6s ease;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 900;
+  opacity: 0.5;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HEADER
+══════════════════════════════════════════════════════════════ */
+header {
+  background-color: var(--s-header);
+  color: var(--cream);
+  padding: 3rem 2rem 2.8rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: background-color 0.6s ease;
+}
+header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 0; right: 0;
+  height: 40px;
+  background: var(--s-bg);
+  clip-path: ellipse(55% 100% at 50% 100%);
+  transition: background-color 0.6s ease;
+}
+.vine { position: absolute; top: 0; bottom: 0; width: 80px; opacity: 0.12; pointer-events: none; }
+.vine-right { right: 0; transform: scaleX(-1); }
+.header-eyebrow { font-size: 0.68rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--sage); margin-bottom: 0.8rem; }
+header h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.2rem, 6vw, 4.2rem); font-weight: 400; color: var(--straw); line-height: 1.1; }
+header h1 em { color: var(--s-accent); font-style: italic; transition: color 0.6s; }
+.header-sub { font-size: 0.78rem; letter-spacing: 0.08em; color: var(--sky); margin-top: 0.6rem; }
+
+/* ═══════════════════════════════════════════════════════════
+   TOOLBAR (search + buttons)
+══════════════════════════════════════════════════════════════ */
+.toolbar {
+  background: var(--straw);
+  border-bottom: 2px solid #d4c49a;
+  padding: 0.65rem 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.search-wrap {
+  flex: 1;
+  min-width: 160px;
+  position: relative;
+}
+.search-wrap::before {
+  content: '🔍';
+  position: absolute;
+  left: 0.7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+#searchInput {
+  width: 100%;
+  padding: 0.5rem 0.8rem 0.5rem 2.2rem;
+  border: 1px solid #c4b48a;
+  border-radius: 3px;
+  background: white;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.85rem;
+  color: var(--soil);
+  outline: none;
+  transition: border-color 0.2s;
+}
+#searchInput:focus { border-color: var(--moss); }
+#searchInput::placeholder { color: #aaa; }
+
+.tb-btn {
+  border: none;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.5rem 0.9rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  white-space: nowrap;
+}
+.tb-btn:active { transform: scale(0.97); }
+.tb-btn-planner { background: var(--moss); color: white; }
+.tb-btn-planner:hover { background: var(--leaf); }
+.tb-btn-pantry  { background: var(--rust); color: white; }
+.tb-btn-pantry:hover { background: var(--bark); }
+
+
+/* ═══════════════════════════════════════════════════════════
+   MONTH NAV
+══════════════════════════════════════════════════════════════ */
+.month-nav {
+  background: var(--s-header);
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  justify-content: center;
+  flex-wrap: wrap;
+  border-bottom: 3px solid var(--s-accent);
+  transition: background-color 0.6s, border-color 0.6s;
+}
+.month-nav::-webkit-scrollbar { display: none; }
+.month-btn {
+  background: none;
+  border: none;
+  color: var(--straw);
+  font-family: 'Lato', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+  transition: color 0.2s;
+}
+.month-btn:hover { color: var(--amber); }
+.month-btn.active {
+  color: white;
+  background: var(--s-accent);
+  font-weight: 700;
+  transition: background-color 0.4s;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SEASON BANNER
+══════════════════════════════════════════════════════════════ */
+.season-banner {
+  text-align: center;
+  padding: 1.4rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.season-badge {
+  background: var(--s-accent);
+  color: white;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 0.35rem 1rem;
+  border-radius: 2px;
+  transition: background-color 0.6s;
+}
+.month-headline {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.5rem, 4vw, 2.3rem);
+  color: var(--bark);
+  font-weight: 400;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PLANNER PANEL
+══════════════════════════════════════════════════════════════ */
+.planner-wrap {
+  background: white;
+  border-bottom: 2px solid var(--straw);
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.4s ease;
+}
+.planner-wrap.open { max-height: 600px; }
+.planner-inner { padding: 1.2rem 1.5rem 1.5rem; }
+.planner-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  color: var(--bark);
+  margin-bottom: 1rem;
+}
+.planner-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.planner-day {
+  background: #f9f5ed;
+  border: 1px solid var(--straw);
+  border-radius: 3px;
+  padding: 0.5rem;
+  min-height: 80px;
+}
+.planner-day-name {
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--moss);
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+  display: block;
+}
+.planner-veg-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  border: 1px solid var(--straw);
+  border-radius: 2px;
+  padding: 0.2rem 0.4rem;
+  margin-bottom: 0.3rem;
+  font-size: 0.72rem;
+  color: var(--bark);
+}
+.planner-veg-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--rust);
+  font-size: 0.9rem;
+  line-height: 1;
+  padding: 0;
+}
+.planner-empty { font-size: 0.7rem; color: #bbb; font-style: italic; }
+.planner-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.planner-actions button {
+  border: none;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.5rem 1rem;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.btn-shopping { background: var(--moss); color: white; }
+.btn-shopping:hover { background: var(--leaf); }
+.btn-clear-planner { background: #eee; color: #666; }
+.btn-clear-planner:hover { background: #e0e0e0; }
+
+/* Day picker popover */
+.day-picker {
+  position: fixed;
+  z-index: 500;
+  background: white;
+  border: 1px solid var(--straw);
+  border-radius: 4px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  padding: 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.3rem;
+  min-width: 200px;
+}
+.day-picker button {
+  background: var(--s-bg);
+  border: 1px solid var(--straw);
+  border-radius: 2px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.7rem;
+  padding: 0.4rem 0.3rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.day-picker button:hover { background: var(--moss); color: white; }
+
+/* ═══════════════════════════════════════════════════════════
+   MAIN CONTAINER
+══════════════════════════════════════════════════════════════ */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+}
+.intro-text {
+  text-align: center;
+  font-size: 0.88rem;
+  line-height: 1.85;
+  color: var(--moss);
+  max-width: 620px;
+  margin: 0 auto 2rem;
+  padding: 1rem 1rem 0;
+}
+.search-status {
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--sage);
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   VEG GRID & CARDS
+══════════════════════════════════════════════════════════════ */
+.veg-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 1.5rem;
+}
+.veg-card {
+  background: white;
+  border: 1px solid var(--straw);
+  border-radius: 4px;
+  overflow: hidden;
+  transition: transform 0.25s, box-shadow 0.25s;
+  display: flex;
+  flex-direction: column;
+}
+.veg-card:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(44,26,14,0.11); }
+.veg-card:active { transform: translateY(-1px); }
+
+/* Emoji banner */
+.veg-emoji-banner {
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.8rem;
+  position: relative;
+  flex-shrink: 0;
+}
+.season-spring .veg-emoji-banner  { background: linear-gradient(135deg, #d4f0c0, #e8f5d0); }
+.season-summer .veg-emoji-banner  { background: linear-gradient(135deg, #fff4cc, #ffe8a0); }
+.season-autumn .veg-emoji-banner  { background: linear-gradient(135deg, #f5deb3, #e8c87a); }
+.season-winter .veg-emoji-banner  { background: linear-gradient(135deg, #d0e8f5, #b8d8ee); }
+.season-yearround .veg-emoji-banner { background: linear-gradient(135deg, #e8e0f5, #d0c8e8); }
+
+/* Add to planner button on banner */
+.add-plan-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(255,255,255,0.85);
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 3px;
+  font-size: 0.65rem;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  color: var(--moss);
+  font-family: 'Lato', sans-serif;
+  letter-spacing: 0.05em;
+  transition: background 0.15s;
+}
+.add-plan-btn:hover { background: white; }
+
+/* Peak badge */
+.peak-tag {
+  display: inline-block;
+  background: var(--s-accent);
+  color: white;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.18rem 0.55rem;
+  border-radius: 2px;
+  margin-bottom: 0.5rem;
+  transition: background-color 0.6s;
+}
+
+/* Card body */
+.veg-card-body {
+  padding: 1rem 1.2rem 0;
+  border-top: 2px solid var(--straw);
+}
+.veg-name { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; color: var(--bark); margin-bottom: 0.15rem; }
+.veg-latin { font-size: 0.72rem; font-style: italic; color: var(--sage); margin-bottom: 0.8rem; }
+
+/* ── Tab bar ── */
+.tab-bar {
+  display: flex;
+  border-bottom: 2px solid var(--straw);
+  margin: 0 -1.2rem;
+  padding: 0 1.2rem;
+}
+.tab-btn {
+  background: none;
+  border: none;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sage);
+  padding: 0.55rem 0.7rem;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+.tab-btn:hover { color: var(--bark); }
+.tab-btn.active { color: var(--bark); border-bottom-color: var(--s-accent); font-weight: 700; }
+
+/* ── Tab panels ── */
+.tab-panel { display: none; padding: 0.9rem 0 1rem; }
+.tab-panel.active { display: block; }
+
+/* Info tab */
+.veg-note { font-size: 0.82rem; line-height: 1.65; color: #555; margin-bottom: 0.9rem; }
+.storage-box {
+  background: #f5f0e5;
+  border-left: 3px solid var(--amber);
+  padding: 0.6rem 0.8rem;
+  border-radius: 0 3px 3px 0;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: var(--bark);
+}
+.storage-box strong { display: block; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.2rem; }
+
+/* Meals tab */
+.meal-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid #f0ebe0;
+}
+.meal-item:last-child { border-bottom: none; }
+.meal-icon { font-size: 1.3rem; flex-shrink: 0; padding-top: 0.05rem; }
+.meal-content { flex: 1; min-width: 0; }
+.meal-name-row { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.2rem; }
+.meal-name { font-weight: 700; font-size: 0.83rem; color: var(--bark); }
+.difficulty-badge {
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.1rem 0.4rem;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.diff-easy    { background: #d4f0c0; color: #2a6020; }
+.diff-medium  { background: #fff0c0; color: #7a5000; }
+.diff-weekend { background: #f0d8c0; color: #7a3010; }
+.meal-desc { font-size: 0.77rem; color: #666; line-height: 1.5; }
+.meal-link {
+  display: inline-block;
+  margin-top: 0.3rem;
+  font-size: 0.68rem;
+  color: var(--moss);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+}
+.meal-link:hover { text-decoration: underline; color: var(--leaf); }
+
+/* Grow tab */
+.grow-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+.grow-cell { background: #f5f5f0; padding: 0.5rem 0.7rem; border-radius: 3px; }
+.grow-cell-label { font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sage); margin-bottom: 0.15rem; display: block; }
+.grow-cell-value { font-size: 0.78rem; color: var(--bark); font-weight: 700; }
+.grow-tip {
+  background: #e8f0e5;
+  border-left: 3px solid var(--moss);
+  padding: 0.55rem 0.7rem;
+  font-size: 0.77rem;
+  line-height: 1.55;
+  color: #3a4a35;
+  border-radius: 0 3px 3px 0;
+}
+.grow-tip strong { font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--moss); display: block; margin-bottom: 0.15rem; }
+
+/* Empty state */
+.no-veg {
+  text-align: center;
+  padding: 3.5rem 2rem;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--sage);
+  grid-column: 1 / -1;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   WHERE TO BUY SECTION
+══════════════════════════════════════════════════════════════ */
+.where-to-buy {
+  background: var(--soil);
+  color: var(--cream);
+  padding: 3rem 2rem;
+  margin-top: 1rem;
+}
+.wtb-inner { max-width: 1100px; margin: 0 auto; }
+.wtb-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 400;
+  color: var(--straw);
+  margin-bottom: 0.5rem;
+}
+.wtb-sub { font-size: 0.85rem; color: var(--sage); margin-bottom: 2rem; line-height: 1.6; }
+.wtb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+.wtb-card {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px;
+  padding: 1.2rem;
+}
+.wtb-card-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+.wtb-card-name { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--straw); margin-bottom: 0.4rem; }
+.wtb-card-desc { font-size: 0.78rem; color: #a09070; line-height: 1.6; }
+.wtb-card a { color: var(--amber); text-decoration: none; }
+.wtb-card a:hover { text-decoration: underline; }
+
+/* ═══════════════════════════════════════════════════════════
+   MODALS
+══════════════════════════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 800;
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem 1rem;
+  overflow-y: auto;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--cream);
+  border-radius: 6px;
+  width: 100%;
+  max-width: 680px;
+  padding: 2rem;
+  position: relative;
+  margin: auto;
+}
+.modal-close {
+  position: absolute;
+  top: 0.8rem; right: 0.9rem;
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: var(--sage);
+  line-height: 1;
+}
+.modal-close:hover { color: var(--soil); }
+.modal-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  color: var(--bark);
+  margin-bottom: 0.4rem;
+}
+.modal-sub { font-size: 0.82rem; color: var(--sage); margin-bottom: 1.2rem; }
+
+/* Pantry modal */
+.pantry-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.2rem; }
+.pantry-chip {
+  background: white;
+  border: 1px solid var(--straw);
+  border-radius: 20px;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--bark);
+  user-select: none;
+}
+.pantry-chip:hover { border-color: var(--moss); }
+.pantry-chip.selected { background: var(--moss); color: white; border-color: var(--moss); }
+.pantry-results-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  color: var(--bark);
+  margin-bottom: 0.8rem;
+  font-style: italic;
+}
+.pantry-veg-group { margin-bottom: 1.2rem; }
+.pantry-veg-group-name {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sage);
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--straw);
+}
+.pantry-empty { font-style: italic; color: var(--sage); font-size: 0.85rem; }
+
+/* Shopping list modal */
+.shopping-list { list-style: none; columns: 2; gap: 1.5rem; }
+.shopping-list li {
+  font-size: 0.85rem;
+  color: var(--bark);
+  padding: 0.35rem 0;
+  border-bottom: 1px dashed var(--straw);
+  break-inside: avoid;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.shopping-list li::before { content: '☐'; color: var(--moss); flex-shrink: 0; }
+
+/* ═══════════════════════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════════════════════════ */
+footer {
+  background: #1a100a;
+  color: var(--sage);
+  text-align: center;
+  padding: 1.8rem 2rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════════════════ */
+@media (max-width: 600px) {
+  .month-btn { padding: 0.75rem 0.65rem; font-size: 0.63rem; }
+  .veg-grid { grid-template-columns: 1fr; }
+  .planner-grid { grid-template-columns: repeat(4, 1fr); }
+  .shopping-list { columns: 1; }
+  .toolbar { gap: 0.4rem; }
+  .tb-btn { font-size: 0.62rem; padding: 0.45rem 0.65rem; }
+  .wtb-grid { grid-template-columns: 1fr; }
+  .grow-grid { grid-template-columns: 1fr; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PRINT STYLES
+══════════════════════════════════════════════════════════════ */
+@media print {
+  .toolbar, .month-nav, nav, .planner-wrap, .modal-overlay,
+  .where-to-buy, footer, .add-plan-btn, .tab-bar,
+  .tb-btn, .share-msg { display: none !important; }
+
+  body { background: white; }
+  header { background: white; color: black; border-bottom: 2px solid #ccc; padding: 1rem; }
+  header h1 { color: black; font-size: 2rem; }
+  header h1 em { color: #555; }
+  header::after { display: none; }
+  .vine { display: none; }
+  .header-eyebrow, .header-sub { color: #555; }
+  .season-banner { padding: 0.5rem; border-bottom: 1px solid #ccc; }
+  .month-headline { font-size: 1.3rem; }
+  .season-badge { background: #555; }
+  .container { padding: 0; }
+  .veg-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .veg-card { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+  .tab-panel { display: block !important; }
+  .tab-panel + .tab-panel { border-top: 1px solid #eee; padding-top: 0.5rem; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HEADER ═══════════ -->
+<header>
+  <svg class="vine" viewBox="0 0 80 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M40 0 Q20 50 40 100 Q60 150 30 200 Q10 250 40 300 Q60 350 30 400" stroke="white" stroke-width="2.5" fill="none"/>
+    <circle cx="55" cy="75"  r="11" fill="white"/><circle cx="25" cy="165" r="9"  fill="white"/>
+    <circle cx="55" cy="255" r="13" fill="white"/><circle cx="20" cy="340" r="8"  fill="white"/>
+  </svg>
+  <svg class="vine vine-right" viewBox="0 0 80 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M40 0 Q20 50 40 100 Q60 150 30 200 Q10 250 40 300 Q60 350 30 400" stroke="white" stroke-width="2.5" fill="none"/>
+    <circle cx="55" cy="75"  r="11" fill="white"/><circle cx="25" cy="165" r="9"  fill="white"/>
+    <circle cx="55" cy="255" r="13" fill="white"/><circle cx="20" cy="340" r="8"  fill="white"/>
+  </svg>
+  <div class="header-eyebrow">🌿 From the Allotment to Your Table</div>
+  <h1>Northern <em>Roots</em></h1>
+  <div class="header-sub">Yorkshire · Lancashire · Cumbria · Durham · Northumberland · Cleveland</div>
+</header>
+
+<!-- ═══════════ TOOLBAR ═══════════ -->
+<div class="toolbar">
+  <div class="search-wrap">
+    <input type="search" id="searchInput" placeholder="Search veg… e.g. leek, carrot" autocomplete="off">
+  </div>
+  <button class="tb-btn tb-btn-planner" id="plannerToggle">📅 Meal Planner</button>
+  <button class="tb-btn tb-btn-pantry"  id="pantryBtn">🧑‍🍳 Chef's Pantry</button>
+
+</div>
+
+<!-- ═══════════ MONTH NAV ═══════════ -->
+<nav class="month-nav" id="monthNav"></nav>
+
+<!-- ═══════════ SEASON BANNER ═══════════ -->
+<div class="season-banner">
+  <div class="season-badge" id="seasonBadge">🌱 Season</div>
+  <div class="month-headline" id="monthHeadline">Loading…</div>
+</div>
+
+<!-- ═══════════ MEAL PLANNER ═══════════ -->
+<div class="planner-wrap" id="plannerWrap">
+  <div class="planner-inner">
+    <div class="planner-title">📅 Your Weekly Meal Planner</div>
+    <div class="planner-grid" id="plannerGrid"></div>
+    <div class="planner-actions">
+      <button class="btn-shopping" id="shoppingBtn">🛒 Generate Shopping List</button>
+      <button class="btn-clear-planner" id="clearPlannerBtn">Clear All</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MAIN GRID ═══════════ -->
+<div class="container">
+  <p class="intro-text" id="introText"></p>
+  <div class="search-status" id="searchStatus"></div>
+  <div class="veg-grid" id="vegGrid"></div>
+</div>
+
+<!-- ═══════════ WHERE TO BUY ═══════════ -->
+<section class="where-to-buy">
+  <div class="wtb-inner">
+    <div class="wtb-title">Where to Buy Northern Produce</div>
+    <div class="wtb-sub">The best seasonal veg comes from growers close to home. Here are the best ways to source it across the North of England.</div>
+    <div class="wtb-grid">
+      <div class="wtb-card">
+        <div class="wtb-card-icon">🚜</div>
+        <div class="wtb-card-name">Riverford Organic</div>
+        <div class="wtb-card-desc">Weekly veg boxes delivered direct from British organic farms. Northern customers are served from their regional hub. <a href="https://www.riverford.co.uk" target="_blank" rel="noopener">riverford.co.uk</a></div>
+      </div>
+      <div class="wtb-card">
+        <div class="wtb-card-icon">🥦</div>
+        <div class="wtb-card-name">Odd Box</div>
+        <div class="wtb-card-desc">Seasonal wonky and surplus veg boxes at reduced prices — great for the budget-conscious and reducing food waste. <a href="https://www.oddbox.co.uk" target="_blank" rel="noopener">oddbox.co.uk</a></div>
+      </div>
+      <div class="wtb-card">
+        <div class="wtb-card-icon">🏪</div>
+        <div class="wtb-card-name">Northern Farm Shops</div>
+        <div class="wtb-card-desc">Search FARMA's directory for certified farm shops near you across Yorkshire, Lancashire, Cumbria and the Northeast. <a href="https://www.farma.org.uk" target="_blank" rel="noopener">farma.org.uk</a></div>
+      </div>
+      <div class="wtb-card">
+        <div class="wtb-card-icon">🏪</div>
+        <div class="wtb-card-name">Farmers Markets</div>
+        <div class="wtb-card-desc">Malton Food Market (Yorkshire), Durham Indoor Market, Grasmere (Cumbria) and Hexham Market (Northumberland) are all excellent for seasonal local produce.</div>
+      </div>
+      <div class="wtb-card">
+        <div class="wtb-card-icon">📦</div>
+        <div class="wtb-card-name">Abel & Cole</div>
+        <div class="wtb-card-desc">Organic weekly veg box with British-first sourcing. Good coverage across the North of England. <a href="https://www.abelandcole.co.uk" target="_blank" rel="noopener">abelandcole.co.uk</a></div>
+      </div>
+      <div class="wtb-card">
+        <div class="wtb-card-icon">🌱</div>
+        <div class="wtb-card-name">Grow Your Own</div>
+        <div class="wtb-card-desc">The North's allotment culture is thriving. Contact your local council to join a waiting list — or check the National Allotment Society for tips and plots.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Northern Roots &mdash; Celebrating the seasonal harvest of Yorkshire, Lancashire, Cumbria, County Durham, Northumberland &amp; Cleveland
+</footer>
+
+<!-- ═══════════ CHEF'S PANTRY MODAL ═══════════ -->
+<div class="modal-overlay" id="pantryModal">
+  <div class="modal-box">
+    <button class="modal-close" id="pantryClose">×</button>
+    <div class="modal-title">🧑‍🍳 Chef's Pantry</div>
+    <div class="modal-sub">Tick the veg you have and discover what you can make. Showing in-season veg for <span id="pantryMonth"></span>.</div>
+    <div class="pantry-chips" id="pantryChips"></div>
+    <div id="pantryResults"></div>
+  </div>
+</div>
+
+<!-- ═══════════ SHOPPING LIST MODAL ═══════════ -->
+<div class="modal-overlay" id="shoppingModal">
+  <div class="modal-box">
+    <button class="modal-close" id="shoppingClose">×</button>
+    <div class="modal-title">🛒 Your Shopping List</div>
+    <div class="modal-sub" id="shoppingSubtitle"></div>
+    <ul class="shopping-list" id="shoppingList"></ul>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════════
+
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS   = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+const SEASON_INFO = {
+  winter:   { label: '❄️ Winter',  months: [0,1,11]  },
+  spring:   { label: '🌱 Spring',  months: [2,3,4]   },
+  summer:   { label: '☀️ Summer',  months: [5,6,7]   },
+  autumn:   { label: '🍂 Autumn',  months: [8,9,10]  },
+};
+
+// Per-month visual theme: [bg, header, accent]
+const MONTH_THEMES = [
+  ['#e8eef8','#151e30','#4a7ab5'], // Jan  — icy blue
+  ['#eaeef7','#1a2535','#5a8ac5'], // Feb  — deep slate
+  ['#e5f5e8','#183020','#4a8f5a'], // Mar  — fresh spring
+  ['#ebf7eb','#1e3d22','#5ab060'], // Apr  — spring green
+  ['#f2f7e5','#252f10','#80a820'], // May  — yellow-green
+  ['#f7f5e2','#28200a','#c89010'], // Jun  — golden
+  ['#f7f0d8','#2c1808','#d48808'], // Jul  — summer gold
+  ['#f5e8d5','#2a1508','#c87018'], // Aug  — harvest amber
+  ['#f3e0c8','#2a1808','#b56018'], // Sep  — early autumn
+  ['#f0d8c0','#2c1008','#b54010'], // Oct  — rust
+  ['#ecdcd0','#280e08','#8a3810'], // Nov  — dark earth
+  ['#e5ecf8','#141e30','#3a6a9f'], // Dec  — winter blue
+];
+
+const MONTH_INTROS = [
+  "January is the heart of winter across the North — from the Cumbrian fells to the Cleveland Hills, root cellars come into their own and hardy brassicas stand proud in the frost.",
+  "February stays cold from Northumberland to Lancashire, but the first stirrings of spring are near — storage veg and leeks carry us through the final grey weeks across Cleveland and beyond.",
+  "March bridges winter and spring across the region. Purple sprouting broccoli is the star of northern kitchens this month, cropping even in the cooler Northumberland and Cleveland air.",
+  "April brings tentative warmth to the Tyne, Tees and Cleveland valleys. Spring onions push through, and overwintered greens reach their peak from Durham to the Yorkshire Dales.",
+  "May is the 'hungry gap' — an exciting bridge between seasons. Asparagus and spinach herald better things across every northern county, from Cleveland to Cumbria.",
+  "June bursts into life. The long northern days give peas, broad beans and courgettes their best start — even in Cumbria, Northumberland and the Cleveland Hills.",
+  "July is summer abundance — runner beans, courgettes and salad leaves love the generous light of the northern summer, from the Eden Valley to the Cleveland coast.",
+  "August is peak harvest from the Scottish borders down through Cleveland to South Yorkshire — sweetcorn, French beans, beetroot and tomatoes all at their finest.",
+  "September is the crown jewel of the northern growing year. Everything ripens before the cold returns, whether you're on the Northumberland coast, the Cleveland Hills or the Lancashire plain.",
+  "October brings squash, root veg and the first frosts that sweep down from the fells and across the Cleveland moors — sweetening Brussels sprouts on the stalk across the whole region.",
+  "November strips the garden back across Northumberland, Cleveland and County Durham — but kale, parsnips and leeks step forward to carry the table through the dark months.",
+  "December returns us to roots — parsnips sweeter for the frost from the Lake District to the Cleveland Hills, and sprouts ready for the festive table.",
+];
+
+// ═══════════════════════════════════════════════════════════
+// VEG DATABASE
+// Each veg has: name, latin, emoji, months[], peak[], season,
+//   note, storage, grow{sow,plant,harvest,tip},
+//   meals[]{icon, name, desc, time, difficulty, link}
+// ═══════════════════════════════════════════════════════════
+
+const VEG = [
+  {
+    name: 'Leek', latin: 'Allium ampeloprasum', emoji: '🌿',
+    months: [0,1,2,3,10,11], peak: [11,0,1,2], season: 'winter',
+    note: 'The leek is the backbone of the northern winter kitchen. Hardy in frost, mild and sweet when slow-cooked.',
+    storage: 'Up to 2–3 weeks in the fridge, stored unwashed and loosely wrapped in a damp cloth. Trim roots before storing.',
+    grow: { sow: 'Feb–Mar (indoors)', plant: 'May–Jun (outdoors)', harvest: 'Oct–Mar', tip: 'Earth up stems as they grow to blanch more white stem. Northern growers should protect young plants from spring frosts with fleece.' },
+    meals: [
+      { icon:'🥣', name:'Leek & Potato Soup',      desc:'A northern classic. Slow-cook leeks in butter, add floury potatoes and stock, blend until silky.',   time:'30 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=leek+potato+soup' },
+      { icon:'🥧', name:'Leek & Cheese Tart',       desc:'Softened leeks in a shortcrust pastry case with mature cheddar and a cream & egg custard.',          time:'60 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=leek+cheese+tart' },
+      { icon:'🍗', name:'Cock-a-Leekie',            desc:'Traditional Scottish-influenced broth with chicken, leeks, barley and a handful of prunes.',          time:'90 min',  difficulty:'weekend', link:'https://www.bbcgoodfood.com/search?q=cock+a+leekie' },
+      { icon:'🥘', name:'Leek & Mushroom Risotto',  desc:'Northern twist on an Italian staple — leeks braised down into the rice base with wild mushrooms.',   time:'45 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=leek+mushroom+risotto' },
+    ]
+  },
+  {
+    name: 'Kale', latin: 'Brassica oleracea var. sabellica', emoji: '🥬',
+    months: [0,1,2,10,11], peak: [11,0,1], season: 'winter',
+    note: 'Frost-sweetened kale is a North England staple. Curly varieties grow happily in Yorkshire and Cumbria.',
+    storage: '3–5 days in the fridge. Best eaten very fresh. Strip leaves from stems before storing in a damp bag.',
+    grow: { sow: 'Mar–May', plant: 'May–Jun', harvest: 'Sep–Mar', tip: 'Extremely hardy — kale will stand through the harshest northern winters. Pick outer leaves first to keep the plant producing. Watch for cabbage white caterpillars.' },
+    meals: [
+      { icon:'🥣', name:'Kale & White Bean Soup',   desc:'Tuscan-style ribollita adapted for the North — kale, cannellini beans and crusty bread.',           time:'40 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=kale+white+bean+soup' },
+      { icon:'🍳', name:'Kale & Egg Hash',           desc:'Wilted kale with crispy potatoes, topped with fried eggs and a splash of hot sauce.',               time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=kale+egg+hash' },
+      { icon:'🥗', name:'Warm Kale & Grain Salad',  desc:'Massaged kale with pearl barley, roasted squash and a mustard dressing.',                           time:'35 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=warm+kale+grain+salad' },
+      { icon:'🥙', name:'Colcannon',                 desc:'Irish-inspired mash blended with wilted kale, butter and spring onions — winter comfort.',          time:'30 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=colcannon+kale' },
+    ]
+  },
+  {
+    name: 'Parsnip', latin: 'Pastinaca sativa', emoji: '🥕',
+    months: [0,1,10,11], peak: [11,0,1], season: 'winter',
+    note: 'Frost makes parsnips sweeter — the first hard frost converts their starch to sugars. A northern roast essential.',
+    storage: '3–4 weeks in a cool dark place or fridge. Remove leafy tops. Can be left in the ground until needed.',
+    grow: { sow: 'Mar–Apr (direct sow)', plant: 'N/A — direct sow only', harvest: 'Oct–Mar', tip: 'Parsnips are slow to germinate. Sow thickly and be patient — 3–4 weeks is normal in northern soils. Leave in the ground and harvest after the first frost for maximum sweetness.' },
+    meals: [
+      { icon:'🍗', name:'Honey-Roasted Parsnips',       desc:'Tossed in honey and thyme, roasted until caramelised and deeply nutty.',                    time:'40 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=honey+roasted+parsnips' },
+      { icon:'🥣', name:'Curried Parsnip Soup',          desc:'Blended with onions, ginger, cumin and vegetable stock — a warming bowl for a grey day.',  time:'35 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=curried+parsnip+soup' },
+      { icon:'🥘', name:'Parsnip & Blue Cheese Gratin', desc:'Thinly sliced parsnips baked in cream with crumbled Yorkshire blue cheese.',                time:'75 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=parsnip+gratin' },
+      { icon:'🫕', name:'Lancashire Hotpot',             desc:'Add parsnips to the classic — layered with lamb, onions and topped with potato.',          time:'2 hrs',   difficulty:'weekend', link:'https://www.bbcgoodfood.com/search?q=lancashire+hotpot' },
+    ]
+  },
+  {
+    name: 'Brussels Sprouts', latin: 'Brassica oleracea var. gemmifera', emoji: '🥦',
+    months: [0,10,11], peak: [11,0], season: 'winter',
+    note: 'Controversial but glorious when cooked right. A firm frost on the stalk sweetens them beautifully.',
+    storage: '1 week in the fridge. If possible, keep on the stalk until needed — they stay fresher much longer this way.',
+    grow: { sow: 'Feb–Mar (indoors)', plant: 'May', harvest: 'Oct–Feb', tip: 'Firm, compact soil gives firm, compact sprouts. Stake plants before winter as they can be toppled by northern gales. Net against pigeons — they love the young plants.' },
+    meals: [
+      { icon:'🥓', name:'Sprouts with Bacon & Chestnuts', desc:'Pan-fried in butter with crispy smoked bacon and roasted chestnuts — the festive classic.',  time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=brussels+sprouts+bacon+chestnuts' },
+      { icon:'🍳', name:'Bubble & Squeak Patties',        desc:'Leftover sprouts and mash fried into crispy patties — Boxing Day staple.',                   time:'15 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=bubble+squeak' },
+      { icon:'🥗', name:'Shredded Sprout Salad',          desc:'Raw sprouts finely sliced with apple, walnuts and a cider vinegar dressing.',                time:'15 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=shredded+brussels+sprout+salad' },
+      { icon:'🧀', name:'Cheesy Sprout Bake',             desc:'Blanched sprouts in a rich mornay sauce, topped with golden breadcrumbs.',                   time:'45 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=cheesy+brussel+sprout+bake' },
+    ]
+  },
+  {
+    name: 'Purple Sprouting Broccoli', latin: 'Brassica oleracea var. italica', emoji: '🫛',
+    months: [1,2,3], peak: [2,3], season: 'spring',
+    note: 'One of the most eagerly awaited crops in the northern garden — tiny purple florets signal the end of winter.',
+    storage: '2–3 days in the fridge. Eat as soon as possible — the florets lose their sweetness quickly after picking.',
+    grow: { sow: 'Apr–May', plant: 'Jun–Jul', harvest: 'Feb–Apr', tip: 'Plant in late summer for the following spring harvest. An excellent crop for the North — it thrives in cool, wet conditions and stands through the winter without protection.' },
+    meals: [
+      { icon:'🍝', name:'PSB with Pasta & Anchovy',  desc:'Blanched PSB tossed with spaghetti, anchovy-chilli butter and toasted breadcrumbs.',         time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=purple+sprouting+broccoli+pasta' },
+      { icon:'🥚', name:'PSB with Soft-boiled Eggs', desc:'Simple and elegant — steamed PSB with runny eggs and lemony yoghurt sauce.',                  time:'15 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=purple+sprouting+broccoli+eggs' },
+      { icon:'🫕', name:'PSB & Stilton Tart',        desc:'Tender PSB in a quiche-style tart with crumbled Stilton and caramelised onions.',             time:'70 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=purple+sprouting+broccoli+tart' },
+      { icon:'🥘', name:'PSB Stir-fry',              desc:'Quick-fried with garlic, ginger, soy and a drizzle of sesame oil.',                          time:'10 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=purple+sprouting+broccoli+stir+fry' },
+    ]
+  },
+  {
+    name: 'Spring Onion', latin: 'Allium fistulosum', emoji: '🌱',
+    months: [3,4,5,6,7,8], peak: [4,5,6], season: 'spring',
+    note: 'Hardy and quick-growing, spring onions add freshness to everything. Easy to grow even in northern clay soils.',
+    storage: '1 week in the fridge, wrapped in a damp paper towel. Can also stand in a glass of water on the windowsill.',
+    grow: { sow: 'Mar–Aug (direct)', plant: 'N/A — direct sow', harvest: 'Jun–Oct', tip: 'Sow a short row every 3–4 weeks for a continuous harvest all summer. One of the easiest and most rewarding crops for northern beginners.' },
+    meals: [
+      { icon:'🥞', name:'Spring Onion Pancakes',           desc:'Chinese-inspired crispy flatbreads folded with sliced spring onions and sesame oil.',       time:'25 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=spring+onion+pancakes' },
+      { icon:'🥗', name:'Spring Salad',                    desc:'Shaved spring onions with radishes, peas and a cider vinegar vinaigrette.',                 time:'10 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=spring+salad+spring+onion' },
+      { icon:'🍜', name:'Spring Onion Ramen',              desc:'Quick broth with noodles topped with soft-boiled egg and plenty of sliced spring onions.',  time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=spring+onion+ramen' },
+      { icon:'🍳', name:'Potato & Spring Onion Frittata', desc:'Thick Italian-style omelette with cooked new potatoes and a generous bunch of spring onions.', time:'30 min', difficulty:'easy', link:'https://www.bbcgoodfood.com/search?q=spring+onion+frittata' },
+    ]
+  },
+  {
+    name: 'Asparagus', latin: 'Asparagus officinalis', emoji: '🌿',
+    months: [4,5], peak: [4,5], season: 'spring',
+    note: 'A fleeting but glorious crop — the northern season runs May to June. Worth the wait every single year.',
+    storage: '2–3 days maximum. Store upright in a little cold water, like flowers, in the fridge. Eat as fresh as possible.',
+    grow: { sow: 'Plant crowns Mar–Apr', plant: 'Mar–Apr (crowns)', harvest: 'Year 3 onwards: May–Jun', tip: 'Patience is essential — you must wait 2–3 years before your first harvest. But an established northern bed will produce for 20+ years. Choose an all-male variety like Gijnlim for best yields.' },
+    meals: [
+      { icon:'🥚', name:'Asparagus with Soft Eggs',  desc:'Blanched spears with runny soft-boiled eggs and shaved Parmesan — elegant simplicity.',       time:'12 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=asparagus+soft+boiled+eggs' },
+      { icon:'🍳', name:'Asparagus Omelette',        desc:'Lightly cooked tips folded into a buttery French omelette with goat\'s cheese.',              time:'15 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=asparagus+omelette' },
+      { icon:'🍝', name:'Asparagus & Lemon Pasta',  desc:'Shaved asparagus with tagliatelle, cream, lemon zest and toasted pine nuts.',                  time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=asparagus+lemon+pasta' },
+      { icon:'🥧', name:'Asparagus Tart',            desc:'Puff pastry base with crème fraîche, asparagus spears, ham and soft-boiled quail eggs.',      time:'45 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=asparagus+tart' },
+    ]
+  },
+  {
+    name: 'Spinach', latin: 'Spinacia oleracea', emoji: '🥬',
+    months: [4,5,6,7,8,9], peak: [5,6,7], season: 'spring',
+    note: 'Grows prolifically in the cool, moist northern summers. Bolt-resistant varieties do especially well.',
+    storage: '2–3 days in the fridge in a sealed bag. Baby leaves wilt even faster — use them same day if possible.',
+    grow: { sow: 'Feb–May and Aug–Sep', plant: 'N/A — direct sow', harvest: 'Apr–Oct', tip: 'Sow in spring and again in late summer for two harvests. In the North, a late August sowing can produce into November under cover. Choose Perpetual Spinach for a hardier option.' },
+    meals: [
+      { icon:'🍛', name:'Saag Aloo',                    desc:'Classic North Indian spinach and potato curry — comforting, earthy and deeply spiced.',   time:'35 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=saag+aloo' },
+      { icon:'🥬', name:'Wilted Spinach & Garlic',      desc:'The simplest side — just butter, garlic and good-quality young spinach leaves.',          time:'5 min',   difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=wilted+spinach+garlic' },
+      { icon:'🥧', name:'Spinach & Ricotta Cannelloni', desc:'Tubes of pasta filled with spinach and ricotta, baked in a rich tomato sauce.',           time:'75 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=spinach+ricotta+cannelloni' },
+      { icon:'🍳', name:'Eggs Florentine',              desc:'Poached eggs on a bed of creamed spinach, finished with hollandaise sauce.',              time:'20 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=eggs+florentine' },
+    ]
+  },
+  {
+    name: 'Broad Bean', latin: 'Vicia faba', emoji: '🫘',
+    months: [5,6,7], peak: [6,7], season: 'summer',
+    note: 'A northern garden favourite — overwinter beans planted in autumn crop earliest. Double-pod for the sweetest taste.',
+    storage: '3–5 days podded in the fridge. They freeze brilliantly — blanch for 2 minutes and freeze in bags for winter use.',
+    grow: { sow: 'Oct–Nov (autumn sow) or Feb–Mar', plant: 'N/A — direct sow', harvest: 'Jun–Aug', tip: 'Autumn-sown broad beans are hardier and crop 4–6 weeks earlier than spring-sown. Pinch out the growing tips when the first pods form to deter blackfly — a common northern problem.' },
+    meals: [
+      { icon:'🥙', name:'Broad Bean Bruschetta',         desc:'Crushed broad beans with mint, lemon and ricotta on sourdough toast.',                  time:'10 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=broad+bean+bruschetta' },
+      { icon:'🫕', name:'Broad Bean & Pancetta Risotto', desc:'Creamy risotto with double-podded broad beans and crispy pancetta.',                    time:'45 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=broad+bean+pancetta+risotto' },
+      { icon:'🥗', name:'Broad Bean & Feta Salad',       desc:'Simple summer salad with lemon, mint and crumbled feta over podded beans.',             time:'10 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=broad+bean+feta+salad' },
+      { icon:'🍝', name:'Broad Bean Pasta',              desc:'Linguine with broad beans, peas, courgette ribbons and a light cream sauce.',           time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=broad+bean+pasta' },
+    ]
+  },
+  {
+    name: 'Pea', latin: 'Pisum sativum', emoji: '🫛',
+    months: [5,6,7,8], peak: [6,7], season: 'summer',
+    note: "There's nothing better than fresh northern peas picked straight from the pod on a warm Dales morning.",
+    storage: '2–3 days in the pod in the fridge — their sugars convert to starch quickly. Freeze immediately after picking for the best flavour.',
+    grow: { sow: 'Mar–Jun (direct)', plant: 'N/A — direct sow', harvest: 'Jun–Sep', tip: 'Provide strong support — northern winds can flatten unsupported pea plants. Sow every 3 weeks for a continuous harvest. Mangetout varieties do particularly well in cool northern summers.' },
+    meals: [
+      { icon:'🥣', name:'Minted Pea Soup',    desc:'Simple, vibrant blended soup with fresh mint, crème fraîche and warm bread.',              time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=minted+pea+soup' },
+      { icon:'🍛', name:'Pea & Mint Risotto', desc:'Blended pea and fresh mint stirred into creamy arborio rice.',                            time:'40 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=pea+mint+risotto' },
+      { icon:'🥗', name:'Pea & Ham Salad',   desc:'Yorkshire ham hock shredded over fresh peas, Little Gem and a mustardy dressing.',        time:'15 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=pea+ham+salad' },
+      { icon:'🫕', name:'Mushy Peas',        desc:'The northern classic — marrowfat peas simmered down with mint and a pinch of bicarbonate.', time:'20 min', difficulty:'easy',   link:'https://www.bbcgoodfood.com/search?q=mushy+peas+recipe' },
+    ]
+  },
+  {
+    name: 'Courgette', latin: 'Cucurbita pepo', emoji: '🥒',
+    months: [6,7,8,9], peak: [7,8], season: 'summer',
+    note: 'Prolific and versatile — one plant produces all summer long. Perfect for the northern polytunnel.',
+    storage: '1 week in the fridge, uncovered. Don\'t wash until ready to use. Baby courgettes only last 3–4 days.',
+    grow: { sow: 'Apr–May (indoors)', plant: 'Jun (after last frost)', harvest: 'Jul–Oct', tip: "The North's late frosts mean you must wait until June to plant out. Start indoors in April and pot on once. Pick every 2–3 days to keep plants producing — a courgette left unpicked becomes a marrow overnight." },
+    meals: [
+      { icon:'🍕', name:"Courgette & Goat's Cheese Pizza", desc:"Shaved courgette with crumbled goat's cheese and lemon zest on a thin crust.",         time:'25 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=courgette+goats+cheese+pizza' },
+      { icon:'🥞', name:'Courgette Fritters',               desc:'Grated courgette fritters with feta and mint, served with cool yoghurt dip.',          time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=courgette+fritters' },
+      { icon:'🫕', name:'Stuffed Courgettes',               desc:'Halved and filled with herby rice, tomato and pine nuts, baked until tender.',         time:'50 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=stuffed+courgettes' },
+      { icon:'🍝', name:'Courgette Carbonara',              desc:'Ribboned courgette added to classic carbonara for a summer twist.',                    time:'20 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=courgette+carbonara' },
+    ]
+  },
+  {
+    name: 'Runner Bean', latin: 'Phaseolus coccineus', emoji: '🫘',
+    months: [7,8,9], peak: [7,8], season: 'summer',
+    note: 'The runner bean is the great northern cottage garden crop — bright red flowers and pods that keep on giving.',
+    storage: '4–5 days in the fridge. Gluts freeze well — blanch for 3 minutes and freeze in portions.',
+    grow: { sow: 'Apr–May (indoors)', plant: 'Jun', harvest: 'Jul–Oct', tip: 'Needs a warm, sheltered spot. Build a sturdy wigwam or double row of canes — runner beans grow 2–3m tall and catch northern winds badly. Water well at the base during flowering to set pods.' },
+    meals: [
+      { icon:'🍲', name:'Runner Bean Minestrone',  desc:'Classic Italian soup given a northern makeover with runner beans, tomatoes and barley.',  time:'50 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=runner+bean+minestrone' },
+      { icon:'🥘', name:'Runner Bean Chutney',     desc:'A northern allotment tradition — preserve the glut in a sweet and tangy chutney.',        time:'90 min',  difficulty:'weekend', link:'https://www.bbcgoodfood.com/search?q=runner+bean+chutney' },
+      { icon:'🥗', name:'Bean & Tomato Salad',    desc:'Blanched runner beans with cherry tomatoes, basil and a red wine vinaigrette.',            time:'15 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=runner+bean+tomato+salad' },
+      { icon:'🥩', name:'Runner Beans with Lamb', desc:'Slow-braised shoulder of lamb with runner beans and rosemary-garlic gravy.',               time:'3 hrs',   difficulty:'weekend', link:'https://www.bbcgoodfood.com/search?q=runner+beans+lamb' },
+    ]
+  },
+  {
+    name: 'Sweetcorn', latin: 'Zea mays', emoji: '🌽',
+    months: [7,8,9], peak: [8], season: 'summer',
+    note: 'Northern varieties need the warmest spots — south-facing walls and polytunnels ripen cobs by August.',
+    storage: '1–2 days only — sugars convert to starch very rapidly. Cook within hours of picking for the best flavour.',
+    grow: { sow: 'Apr–May (indoors)', plant: 'Jun', harvest: 'Aug–Sep', tip: 'Plant in a block rather than a row to aid wind pollination. In the North, choose early-ripening varieties like Swift or Earlibird, and give the warmest, most sheltered spot in the garden or use a polytunnel.' },
+    meals: [
+      { icon:'🔥', name:'Chargrilled Corn on the Cob', desc:'Blackened on a griddle or BBQ, slathered with chilli butter and lime.',                time:'15 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=chargrilled+sweetcorn' },
+      { icon:'🌮', name:'Sweetcorn Salsa',              desc:'Charred corn with red onion, jalapeño, coriander and lime — perfect with fish tacos.', time:'15 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=sweetcorn+salsa' },
+      { icon:'🥣', name:'Corn Chowder',                 desc:'Creamy soup with sweetcorn, potatoes, smoked haddock and a dill garnish.',            time:'40 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=corn+chowder' },
+      { icon:'🥞', name:'Sweetcorn Fritters',           desc:'Crispy corn fritters with spring onions, chilli and a soured cream dip.',            time:'25 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=sweetcorn+fritters' },
+    ]
+  },
+  {
+    name: 'Beetroot', latin: 'Beta vulgaris', emoji: '🟣',
+    months: [6,7,8,9,10], peak: [7,8,9], season: 'summer',
+    note: 'Vibrant and earthy — grows brilliantly across the North. Eat the tops too: they\'re superb wilted like chard.',
+    storage: '2–3 weeks in the fridge without tops. Remove leaves but leave 3cm of stalk to prevent bleeding.',
+    grow: { sow: 'Mar–Jul (direct)', plant: 'N/A — direct sow', harvest: 'Jun–Oct', tip: 'Sow little and often for a continuous harvest. Bolt-resistant varieties like Boltardy are essential for northern spring sowing. Thin to 8cm apart for golf-ball-sized roots.' },
+    meals: [
+      { icon:'🥗', name:'Roasted Beet & Feta Salad', desc:'Wedges of roasted beetroot with walnuts, crumbled feta and rocket.',                    time:'60 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=roasted+beetroot+feta+salad' },
+      { icon:'🥣', name:'Borscht',                   desc:'Eastern European beet soup with cabbage, soured cream and rye bread.',                  time:'60 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=borscht+recipe' },
+      { icon:'🍔', name:'Beetroot Burger',            desc:'Deep purple patties made with beetroot, black beans and oats, in a brioche bun.',      time:'40 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=beetroot+burger' },
+      { icon:'🍰', name:'Chocolate Beetroot Cake',   desc:'Moist, fudgy cake that uses grated raw beetroot for incredible richness.',             time:'70 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=chocolate+beetroot+cake' },
+    ]
+  },
+  {
+    name: 'Tomato', latin: 'Solanum lycopersicum', emoji: '🍅',
+    months: [7,8,9], peak: [8,9], season: 'summer',
+    note: 'Best grown in northern polytunnels or greenhouses. The flavour is incomparable to shop-bought.',
+    storage: '1 week at room temperature (never in the fridge — cold kills the flavour). Ripen green ones on a windowsill.',
+    grow: { sow: 'Feb–Mar (indoors)', plant: 'Jun (under cover or polytunnel)', harvest: 'Aug–Oct', tip: 'In the North, always grow indoors or under cover. Cherry varieties like Gardeners Delight and Sungold ripen fastest and cope best with the shorter northern summers.' },
+    meals: [
+      { icon:'🥗', name:'Caprese Salad',      desc:'Thick-sliced tomatoes with buffalo mozzarella, basil and the best olive oil you own.',     time:'10 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=caprese+salad' },
+      { icon:'🍝', name:'Fresh Tomato Pasta', desc:'Crushed fresh tomatoes tossed with garlic, basil and linguine — 15 minutes of summer.',  time:'15 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=fresh+tomato+pasta' },
+      { icon:'🫙', name:'Tomato Chutney',     desc:'A northern allotment essential — end-of-season glut turned into rich, spiced chutney.',  time:'90 min',  difficulty:'weekend', link:'https://www.bbcgoodfood.com/search?q=tomato+chutney' },
+      { icon:'🥪', name:'Pan con Tomate',     desc:'Ripe tomatoes grated onto sourdough with garlic and sea salt — Spanish simplicity.',     time:'5 min',   difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=pan+con+tomate' },
+    ]
+  },
+  {
+    name: 'Squash', latin: 'Cucurbita maxima', emoji: '🎃',
+    months: [9,10,11], peak: [9,10], season: 'autumn',
+    note: 'Autumn squash store brilliantly and thrive in northern growing conditions — Crown Prince and Butternut are favourites.',
+    storage: '3–6 months in a cool, dry, frost-free place. Do not refrigerate — keep whole, unwashed, and check regularly.',
+    grow: { sow: 'Apr–May (indoors)', plant: 'Jun', harvest: 'Sep–Nov', tip: 'Squash need space — allow 1.5m between plants. In the North, start early indoors and choose faster-ripening varieties. Cure harvested squash in the sun for 10 days to harden the skin for long storage.' },
+    meals: [
+      { icon:'🥣', name:'Roasted Squash Soup',       desc:'Halved squash roasted until caramelised, blended with ginger, coconut milk and chilli.',  time:'60 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=butternut+squash+soup' },
+      { icon:'🥘', name:'Squash & Sage Risotto',     desc:'Roasted squash stirred into a risotto with crispy fried sage leaves.',                    time:'50 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=squash+sage+risotto' },
+      { icon:'🌮', name:'Squash & Black Bean Tacos', desc:'Spiced roasted squash with chipotle, black beans and pickled onions in warm tortillas.',  time:'40 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=squash+black+bean+tacos' },
+      { icon:'🍛', name:'Thai Squash Curry',         desc:'Butternut squash simmered in a fragrant Thai green paste with coconut milk and lime.',    time:'45 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=thai+butternut+squash+curry' },
+    ]
+  },
+  {
+    name: 'Carrot', latin: 'Daucus carota', emoji: '🥕',
+    months: [6,7,8,9,10,11,0,1], peak: [8,9,10], season: 'autumn',
+    note: 'The sandy soils of coastal Lancashire and Yorkshire grow superb long carrots. Frost-sweet in autumn.',
+    storage: '2–3 weeks in the fridge. Remove tops before storing — they draw moisture from the root. Can be left in the ground until spring.',
+    grow: { sow: 'Mar–Jul (direct)', plant: 'N/A — direct sow', harvest: 'Jun–Jan', tip: 'Carrots need deep, stone-free soil. In heavy northern clay, try short-rooted varieties like Chantenay or grow in raised beds. Thin early and cover with fleece against carrot fly.' },
+    meals: [
+      { icon:'🥣', name:'Carrot & Coriander Soup', desc:'Blended with onion, coriander seeds and a squeeze of orange — a warming classic.',   time:'35 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=carrot+coriander+soup' },
+      { icon:'🥩', name:'Glazed Roast Carrots',    desc:'Tossed with honey, thyme and butter, roasted until deeply caramelised.',             time:'40 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=glazed+roast+carrots' },
+      { icon:'🍰', name:'Carrot Cake',             desc:'Moist and warmly spiced, with cream cheese frosting and toasted walnut topping.',    time:'70 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=carrot+cake' },
+      { icon:'🫕', name:'Carrot & Lentil Dahl',   desc:'Warming, fragrant dahl with grated carrots, red lentils and coconut cream.',        time:'35 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=carrot+lentil+dahl' },
+    ]
+  },
+  {
+    name: 'Turnip', latin: 'Brassica rapa', emoji: '🟤',
+    months: [0,1,2,9,10,11], peak: [10,11,0], season: 'winter',
+    note: 'The humble turnip has long fed both people and livestock across Northumberland and Durham. Deeply underrated.',
+    storage: '2–3 weeks in a cool dark place. Remove leaves before storing. Small turnips keep best.',
+    grow: { sow: 'Mar–Aug (direct)', plant: 'N/A — direct sow', harvest: 'Jun–Nov (summer) or Oct–Mar (winter)', tip: 'One of the easiest and fastest crops in the northern garden — summer turnips are ready in 6–8 weeks. Sow in August for a winter crop. A reliable performer in northern clay soils.' },
+    meals: [
+      { icon:'🥣', name:'Turnip & Lentil Soup',    desc:'Diced turnip simmered with red lentils, onion and cumin — earthy and deeply warming.',      time:'35 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=turnip+lentil+soup' },
+      { icon:'🫕', name:'Northumberland Stew',     desc:'Slow-cooked with shin beef, swede, carrot and turnip in a dark, herb-rich gravy.',          time:'2.5 hrs', difficulty:'weekend', link:'https://www.bbcgoodfood.com/search?q=beef+turnip+stew' },
+      { icon:'🥘', name:'Roasted Turnips',         desc:'Cubed and roasted with honey and thyme until caramelised and sweet.',                        time:'35 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=roasted+turnips' },
+      { icon:'🥔', name:'Turnip Mash',             desc:'Mashed with butter and black pepper — a brilliant partner for venison sausages.',           time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=turnip+mash' },
+    ]
+  },
+  {
+    name: 'Swede', latin: 'Brassica napus var. napobrassica', emoji: '🟠',
+    months: [0,1,2,9,10,11], peak: [10,11,0], season: 'winter',
+    note: "Called 'neep' in Northumberland and Cumbria, swede is the great unsung vegetable of the north — sweeter than turnip.",
+    storage: '3–4 weeks in a cool dark place. Rock-hard when fresh, softens slightly in storage — both textures are good.',
+    grow: { sow: 'May–Jun (direct)', plant: 'N/A — direct sow', harvest: 'Sep–Mar', tip: "Swede is a superb crop for northern allotments — it's frost-hardy and can be left in the ground all winter to harvest as needed. Allow 30cm spacing. Net against cabbage white butterflies." },
+    meals: [
+      { icon:'🥩', name:'Haggis, Neeps & Tatties', desc:'The classic combination — swede mashed with butter alongside haggis and fluffy potato.', time:'40 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=neeps+tatties+recipe' },
+      { icon:'🥣', name:'Swede & Bacon Soup',       desc:'Roasted swede blended with chicken stock and crispy smoked Northumberland bacon.',       time:'50 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=swede+soup' },
+      { icon:'🫕', name:'Swede & Lamb Hotpot',      desc:'A northern hotpot with diced swede layered beneath the potato crust with lamb.',        time:'2 hrs',   difficulty:'weekend', link:'https://www.bbcgoodfood.com/search?q=swede+lamb+hotpot' },
+      { icon:'🥕', name:'Swede Dauphinoise',        desc:'Thinly sliced swede baked in cream and garlic — earthy, robust and deeply satisfying.', time:'80 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=swede+dauphinoise' },
+    ]
+  },
+  {
+    name: 'Chard', latin: 'Beta vulgaris subsp. cicla', emoji: '🌿',
+    months: [5,6,7,8,9,10], peak: [6,7,8,9], season: 'summer',
+    note: 'Rainbow chard flourishes in the sheltered valleys of Cumbria and Durham. Colourful, hardy and productive.',
+    storage: '3–5 days in the fridge. Keeps best with stems wrapped in a damp cloth and leaves loosely sealed.',
+    grow: { sow: 'Apr–Jul (direct)', plant: 'N/A — direct sow', harvest: 'Jun–Nov', tip: "Rainbow chard is almost indestructible in northern gardens — it withstands summer heat and autumn frosts alike. Pick outer leaves to keep the plant productive. A late July sowing will produce into winter under cover." },
+    meals: [
+      { icon:'🍳', name:'Chard & Egg Bake',       desc:'Wilted chard with eggs cracked on top, finished under the grill with cheese and chilli.',       time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=chard+baked+eggs' },
+      { icon:'🥘', name:'Chard & Chickpea Stew',  desc:'North African-spiced chickpeas with tumbled chard leaves and harissa yoghurt.',               time:'30 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=chard+chickpea+stew' },
+      { icon:'🫕', name:'Chard & Ricotta Gnudi',  desc:'Pillowy ricotta dumplings with wilted chard, brown butter and sage — simple elegance.',        time:'45 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=chard+ricotta+gnudi' },
+      { icon:'🍝', name:'Chard Stem Gratin',      desc:"Don't waste the stalks — bake them in a white sauce with gruyère until golden.",               time:'50 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=chard+gratin' },
+    ]
+  },
+  {
+    name: 'Jerusalem Artichoke', latin: 'Helianthus tuberosus', emoji: '🌰',
+    months: [0,1,10,11], peak: [11,0,1], season: 'winter',
+    note: "Grows like a weed across Northumberland and Durham allotments — once planted, you'll never be without them.",
+    storage: '1–2 weeks in a cool dark place or fridge. Very perishable once cut — use quickly.',
+    grow: { sow: 'N/A', plant: 'Plant tubers Feb–Apr', harvest: 'Oct–Mar', tip: 'Planted once, they return every year without fail — a blessing for the lazy northern gardener. They grow 2–3m tall and make an excellent windbreak. Save a few small tubers from the harvest to replant for next year.' },
+    meals: [
+      { icon:'🥣', name:'Jerusalem Artichoke Soup',    desc:'Silky, nutty bisque with a swirl of truffle oil and toasted hazelnuts — winter luxury.',  time:'45 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=jerusalem+artichoke+soup' },
+      { icon:'🥘', name:'Roasted Artichokes & Garlic', desc:'Halved and roasted with whole garlic cloves, thyme and a splash of white wine.',           time:'40 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=roasted+jerusalem+artichokes' },
+      { icon:'🍕', name:'Artichoke & Mushroom Tart',  desc:'Thinly sliced artichokes on a puff pastry base with wild mushrooms and Taleggio.',         time:'55 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=jerusalem+artichoke+tart' },
+      { icon:'🥗', name:'Raw Artichoke Salad',        desc:'Paper-thin raw slices with lemon, parmesan, rocket and toasted pine nuts.',                time:'10 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=jerusalem+artichoke+salad' },
+    ]
+  },
+  {
+    name: 'Potato', latin: 'Solanum tuberosum', emoji: '🥔',
+    months: [0,1,2,3,4,5,6,7,8,9,10,11], peak: [6,7,8,9,10], season: 'yearround',
+    note: 'The foundation of northern cooking. Maris Pipers, King Edwards and Charlottes all thrive in northern soils.',
+    storage: 'Months in a cool, dark, dry place (a hessian sack is ideal). Never in the fridge — the cold converts starch to sugar and turns them black when cooked.',
+    grow: { sow: 'Chit from Feb', plant: 'Mar–May', harvest: 'Jun–Oct', tip: 'The North is potato country — the cool, damp climate produces superb flavour. Earth up stems regularly to protect tubers from light (which causes greening). Maincrop varieties left in the ground too long will be eaten by slugs — harvest before October.' },
+    meals: [
+      { icon:'🥘', name:'Proper Chips',         desc:'Triple-cooked in dripping or beef fat — the northern chip shop is unmatched.',                  time:'90 min',  difficulty:'weekend', link:'https://www.bbcgoodfood.com/search?q=triple+cooked+chips' },
+      { icon:'🫕', name:'Lancashire Hotpot',    desc:'Slow-braised lamb neck with onions, topped with a crown of thinly sliced golden potato.',     time:'2.5 hrs', difficulty:'weekend', link:'https://www.bbcgoodfood.com/search?q=lancashire+hotpot' },
+      { icon:'🥔', name:'Baked Potato',         desc:'Enormous floury baked potatoes with toppings: baked beans, mature cheddar or pulled pork.',   time:'75 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=perfect+baked+potato' },
+      { icon:'🥗', name:'New Potato Salad',     desc:'Waxy new potatoes dressed while warm with vinegar, mustard and spring onions.',               time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=new+potato+salad' },
+    ]
+  },
+  {
+    name: 'Onion', latin: 'Allium cepa', emoji: '🧅',
+    months: [0,1,2,3,4,5,6,7,8,9,10,11], peak: [7,8,9], season: 'yearround',
+    note: 'Onions store all winter after a summer harvest — the base of virtually every northern dish worth cooking.',
+    storage: '2–3 months in a cool, dark, dry, well-ventilated place. Braided ropes or nets work best. Never store near potatoes.',
+    grow: { sow: 'Plant sets Mar–Apr or Aug–Sep', plant: 'Mar–Apr (spring) or Sep (autumn)', harvest: 'Jul–Sep', tip: 'Sets (small bulbs) are easier than seed for northern growers. Autumn-planted varieties overwinter and crop earlier the following July. Lift and dry thoroughly in the sun before storing.' },
+    meals: [
+      { icon:'🥣', name:'French Onion Soup',       desc:'Slowly caramelised onions in a rich beef broth, topped with Gruyère croutons.',             time:'80 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=french+onion+soup' },
+      { icon:'🥧', name:'Caramelised Onion Tart',  desc:'Sweet onions in a buttery pastry case with thyme, Gruyère and a touch of balsamic.',       time:'90 min',  difficulty:'medium',  link:'https://www.bbcgoodfood.com/search?q=caramelised+onion+tart' },
+      { icon:'🫙', name:'Pickled Onions',          desc:'A northern pub staple — vinegar-sharp pickled onions perfect with a ploughman\'s.',         time:'30 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=pickled+onions' },
+      { icon:'🫕', name:'Onion Gravy',             desc:'Slow-cooked onions deglazed with ale and beef stock — transformative on sausage and mash.', time:'30 min', difficulty:'easy',   link:'https://www.bbcgoodfood.com/search?q=onion+gravy' },
+    ]
+  },
+  {
+    name: 'Garlic', latin: 'Allium sativum', emoji: '🧄',
+    months: [5,6,7,8], peak: [6,7], season: 'summer',
+    note: 'Planted in October, harvested in July — northern gardeners are discovering how well British garlic grows.',
+    storage: 'Several months in a cool, dry, well-ventilated place. Keep whole until needed — broken bulbs last only 1–2 weeks.',
+    grow: { sow: 'N/A', plant: 'Oct–Nov (best) or Feb–Mar', harvest: 'Jun–Jul', tip: 'Autumn planting is essential in the North — garlic needs a cold period to form good bulbs. Softneck varieties store longer; hardneck (Rocambole types) have superior flavour. Harvest when half the leaves have yellowed.' },
+    meals: [
+      { icon:'🍝', name:'Spaghetti Aglio e Olio', desc:'Pasta with golden garlic slices, chilli flakes and good olive oil — Italian simplicity.',    time:'15 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=spaghetti+aglio+olio' },
+      { icon:'🥖', name:'Garlic Bread',            desc:'Proper homemade garlic butter with parsley slathered into a baguette and baked golden.',    time:'20 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=homemade+garlic+bread' },
+      { icon:'🫕', name:'Roasted Garlic',          desc:'Whole heads roasted until meltingly sweet — squeeze onto cheese or stir into mash.',        time:'50 min',  difficulty:'easy',    link:'https://www.bbcgoodfood.com/search?q=roasted+garlic' },
+      { icon:'🥣', name:'40-Clove Chicken',        desc:'Slow-roasted chicken with a whole head of garlic per portion, becoming sweet and spreadable.', time:'75 min', difficulty:'weekend', link:'https://www.bbcgoodfood.com/search?q=40+clove+garlic+chicken' },
+    ]
+  },
+];
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+
+const savedMonth = parseInt(localStorage.getItem('nr_month'), 10);
+let currentMonth = (!isNaN(savedMonth) && savedMonth >= 0 && savedMonth <= 11)
+  ? savedMonth
+  : new Date().getMonth();
+
+let searchQuery = '';
+
+// Planner: { Mon: [{name, emoji},...], ... }
+const planner = {};
+DAYS.forEach(d => { planner[d] = []; });
+
+// Chef's Pantry selected veg names
+const pantrySelected = new Set();
+
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+
+function getSeason(m) {
+  for (const [key, info] of Object.entries(SEASON_INFO)) {
+    if (info.months.includes(m)) return { key, label: info.label };
+  }
+  return { key: 'winter', label: '❄️ Winter' };
+}
+
+function getVegForMonth(m) {
+  return VEG.filter(v => v.months.includes(m));
+}
+
+function isPeak(veg, m) {
+  return veg.peak.includes(m);
+}
+
+function diffClass(d) {
+  return { easy: 'diff-easy', medium: 'diff-medium', weekend: 'diff-weekend' }[d] || 'diff-easy';
+}
+function diffLabel(d) {
+  return { easy: 'Easy', medium: 'Medium', weekend: 'Weekend Cook' }[d] || d;
+}
+
+// ═══════════════════════════════════════════════════════════
+// SEASONAL THEME
+// ═══════════════════════════════════════════════════════════
+
+function applyTheme(m) {
+  const [bg, header, accent] = MONTH_THEMES[m];
+  const root = document.documentElement.style;
+  root.setProperty('--s-bg',     bg);
+  root.setProperty('--s-header', header);
+  root.setProperty('--s-accent', accent);
+}
+
+// ═══════════════════════════════════════════════════════════
+// MONTH NAV
+// ═══════════════════════════════════════════════════════════
+
+function buildMonthNav() {
+  const nav = document.getElementById('monthNav');
+  MONTHS.forEach((name, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'month-btn' + (i === currentMonth ? ' active' : '');
+    btn.textContent = name.slice(0, 3);
+    btn.addEventListener('click', () => selectMonth(i));
+    nav.appendChild(btn);
+  });
+}
+
+function selectMonth(m) {
+  currentMonth = m;
+  localStorage.setItem('nr_month', m);
+  document.querySelectorAll('.month-btn').forEach((btn, i) => btn.classList.toggle('active', i === m));
+  applyTheme(m);
+  updateHeader();
+  renderVeg();
+}
+
+function updateHeader() {
+  const { label } = getSeason(currentMonth);
+  document.getElementById('seasonBadge').textContent = label;
+  document.getElementById('monthHeadline').textContent = MONTHS[currentMonth] + ' in the North';
+  document.getElementById('introText').textContent = MONTH_INTROS[currentMonth];
+}
+
+// ═══════════════════════════════════════════════════════════
+// BUILD CARD TABS
+// ═══════════════════════════════════════════════════════════
+
+function buildInfoTab(veg) {
+  const panel = document.createElement('div');
+  panel.className = 'tab-panel active';
+  panel.dataset.panel = 'info';
+
+  const note = document.createElement('div');
+  note.className = 'veg-note';
+  note.textContent = veg.note;
+
+  const storageBox = document.createElement('div');
+  storageBox.className = 'storage-box';
+  storageBox.innerHTML = `<strong>🏠 Storage</strong>${veg.storage}`;
+
+  panel.appendChild(note);
+  panel.appendChild(storageBox);
+  return panel;
+}
+
+function buildMealsTab(veg) {
+  const panel = document.createElement('div');
+  panel.className = 'tab-panel';
+  panel.dataset.panel = 'meals';
+
+  veg.meals.forEach(meal => {
+    const item = document.createElement('div');
+    item.className = 'meal-item';
+
+    const icon = document.createElement('div');
+    icon.className = 'meal-icon';
+    icon.textContent = meal.icon;
+
+    const content = document.createElement('div');
+    content.className = 'meal-content';
+
+    const nameRow = document.createElement('div');
+    nameRow.className = 'meal-name-row';
+
+    const name = document.createElement('span');
+    name.className = 'meal-name';
+    name.textContent = meal.name;
+
+    const badge = document.createElement('span');
+    badge.className = `difficulty-badge ${diffClass(meal.difficulty)}`;
+    badge.textContent = `${diffLabel(meal.difficulty)} · ${meal.time}`;
+
+    nameRow.appendChild(name);
+    nameRow.appendChild(badge);
+
+    const desc = document.createElement('div');
+    desc.className = 'meal-desc';
+    desc.textContent = meal.desc;
+
+    const link = document.createElement('a');
+    link.className = 'meal-link';
+    link.href = meal.link;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.textContent = '→ Find a recipe on BBC Good Food';
+
+    content.appendChild(nameRow);
+    content.appendChild(desc);
+    content.appendChild(link);
+    item.appendChild(icon);
+    item.appendChild(content);
+    panel.appendChild(item);
+  });
+  return panel;
+}
+
+function buildGrowTab(veg) {
+  const panel = document.createElement('div');
+  panel.className = 'tab-panel';
+  panel.dataset.panel = 'grow';
+
+  const g = veg.grow;
+  const grid = document.createElement('div');
+  grid.className = 'grow-grid';
+
+  [
+    ['🌱 Sow',     g.sow],
+    ['🌿 Plant',   g.plant],
+    ['🌾 Harvest', g.harvest],
+  ].forEach(([label, val]) => {
+    const cell = document.createElement('div');
+    cell.className = 'grow-cell';
+    cell.innerHTML = `<span class="grow-cell-label">${label}</span><span class="grow-cell-value">${val}</span>`;
+    grid.appendChild(cell);
+  });
+
+  const tip = document.createElement('div');
+  tip.className = 'grow-tip';
+  tip.innerHTML = `<strong>🏴󠁧󠁢󠁥󠁮󠁧󠁿 Northern Tip</strong>${g.tip}`;
+
+  panel.appendChild(grid);
+  panel.appendChild(tip);
+  return panel;
+}
+
+function switchTab(card, tabName) {
+  card.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabName));
+  card.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.dataset.panel === tabName));
+}
+
+// ═══════════════════════════════════════════════════════════
+// BUILD VEG CARD
+// ═══════════════════════════════════════════════════════════
+
+function buildVegCard(veg) {
+  const peak = isPeak(veg, currentMonth);
+  const card = document.createElement('div');
+  card.className = `veg-card season-${veg.season}`;
+  card.dataset.veg = veg.name;
+
+  // ── Banner ──
+  const banner = document.createElement('div');
+  banner.className = 'veg-emoji-banner';
+  banner.textContent = veg.emoji;
+
+  const planBtn = document.createElement('button');
+  planBtn.className = 'add-plan-btn';
+  planBtn.textContent = '📅 Add to Plan';
+  planBtn.title = 'Add to Meal Planner';
+  planBtn.addEventListener('click', e => { e.stopPropagation(); showDayPicker(veg, planBtn); });
+  banner.appendChild(planBtn);
+
+  // ── Body ──
+  const body = document.createElement('div');
+  body.className = 'veg-card-body';
+
+  if (peak) {
+    const tag = document.createElement('span');
+    tag.className = 'peak-tag';
+    tag.textContent = '✦ Peak Season';
+    body.appendChild(tag);
+  }
+
+  const nameEl = document.createElement('div');
+  nameEl.className = 'veg-name';
+  nameEl.textContent = veg.name;
+
+  const latinEl = document.createElement('div');
+  latinEl.className = 'veg-latin';
+  latinEl.textContent = veg.latin;
+
+  // ── Tabs ──
+  const tabBar = document.createElement('div');
+  tabBar.className = 'tab-bar';
+
+  [['info','📋 Info'], ['meals','🍳 Meals'], ['grow','🌱 Grow']].forEach(([key, label]) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (key === 'info' ? ' active' : '');
+    btn.dataset.tab = key;
+    btn.textContent = label;
+    btn.addEventListener('click', () => switchTab(card, key));
+    tabBar.appendChild(btn);
+  });
+
+  body.appendChild(nameEl);
+  body.appendChild(latinEl);
+  body.appendChild(tabBar);
+  body.appendChild(buildInfoTab(veg));
+  body.appendChild(buildMealsTab(veg));
+  body.appendChild(buildGrowTab(veg));
+
+  card.appendChild(banner);
+  card.appendChild(body);
+  return card;
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER VEG GRID
+// ═══════════════════════════════════════════════════════════
+
+function renderVeg() {
+  const grid   = document.getElementById('vegGrid');
+  const status = document.getElementById('searchStatus');
+  grid.innerHTML = '';
+
+  let vegs = getVegForMonth(currentMonth);
+
+  // Sort: peak first
+  vegs.sort((a, b) => {
+    const aPeak = isPeak(a, currentMonth) ? 0 : 1;
+    const bPeak = isPeak(b, currentMonth) ? 0 : 1;
+    return aPeak - bPeak;
+  });
+
+  // Filter by search
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    vegs = vegs.filter(v =>
+      v.name.toLowerCase().includes(q) ||
+      v.note.toLowerCase().includes(q) ||
+      v.meals.some(m => m.name.toLowerCase().includes(q))
+    );
+  }
+
+  status.textContent = searchQuery ? `${vegs.length} result${vegs.length !== 1 ? 's' : ''} for "${searchQuery}"` : '';
+
+  if (vegs.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'no-veg';
+    empty.textContent = searchQuery
+      ? `No veg matching "${searchQuery}" in ${MONTHS[currentMonth]}.`
+      : 'Nothing in season just now — time to browse the seed catalogues.';
+    grid.appendChild(empty);
+    return;
+  }
+
+  vegs.forEach(veg => grid.appendChild(buildVegCard(veg)));
+}
+
+// ═══════════════════════════════════════════════════════════
+// MEAL PLANNER
+// ═══════════════════════════════════════════════════════════
+
+function renderPlanner() {
+  const grid = document.getElementById('plannerGrid');
+  grid.innerHTML = '';
+  DAYS.forEach(day => {
+    const col = document.createElement('div');
+    col.className = 'planner-day';
+
+    const dayName = document.createElement('span');
+    dayName.className = 'planner-day-name';
+    dayName.textContent = day;
+    col.appendChild(dayName);
+
+    if (planner[day].length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'planner-empty';
+      empty.textContent = '—';
+      col.appendChild(empty);
+    } else {
+      planner[day].forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'planner-veg-item';
+        row.textContent = `${item.emoji} ${item.name}`;
+
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'planner-veg-remove';
+        removeBtn.textContent = '×';
+        removeBtn.title = 'Remove';
+        removeBtn.addEventListener('click', () => {
+          planner[day] = planner[day].filter(i => i.name !== item.name);
+          renderPlanner();
+        });
+        row.appendChild(removeBtn);
+        col.appendChild(row);
+      });
+    }
+    grid.appendChild(col);
+  });
+}
+
+function showDayPicker(veg, anchor) {
+  // Remove any existing picker
+  document.querySelectorAll('.day-picker').forEach(el => el.remove());
+
+  const picker = document.createElement('div');
+  picker.className = 'day-picker';
+
+  DAYS.forEach(day => {
+    const btn = document.createElement('button');
+    btn.textContent = day;
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const already = planner[day].some(i => i.name === veg.name);
+      if (!already) {
+        planner[day].push({ name: veg.name, emoji: veg.emoji });
+        renderPlanner();
+      }
+      picker.remove();
+      // Open planner so user sees the result
+      const wrap = document.getElementById('plannerWrap');
+      wrap.classList.add('open');
+      document.getElementById('plannerToggle').textContent = '📅 Meal Planner ▲';
+    });
+    picker.appendChild(btn);
+  });
+
+  // Position
+  const rect = anchor.getBoundingClientRect();
+  picker.style.top  = (rect.bottom + window.scrollY + 4) + 'px';
+  picker.style.left = Math.min(rect.left, window.innerWidth - 220) + 'px';
+  document.body.appendChild(picker);
+
+  setTimeout(() => {
+    document.addEventListener('click', () => picker.remove(), { once: true });
+  }, 10);
+}
+
+function generateShoppingList() {
+  const allVeg = new Set();
+  DAYS.forEach(day => planner[day].forEach(item => allVeg.add(item.name)));
+
+  const list = document.getElementById('shoppingList');
+  const sub  = document.getElementById('shoppingSubtitle');
+  list.innerHTML = '';
+
+  if (allVeg.size === 0) {
+    sub.textContent = 'Your planner is empty — add some veg first!';
+  } else {
+    sub.textContent = `${allVeg.size} seasonal ingredient${allVeg.size > 1 ? 's' : ''} for your week.`;
+    allVeg.forEach(name => {
+      const veg = VEG.find(v => v.name === name);
+      const li = document.createElement('li');
+      li.textContent = veg ? `${veg.emoji} ${name}` : name;
+      list.appendChild(li);
+    });
+  }
+  document.getElementById('shoppingModal').classList.add('open');
+}
+
+// ═══════════════════════════════════════════════════════════
+// CHEF'S PANTRY
+// ═══════════════════════════════════════════════════════════
+
+function openPantry() {
+  const chips = document.getElementById('pantryChips');
+  chips.innerHTML = '';
+  document.getElementById('pantryMonth').textContent = MONTHS[currentMonth];
+
+  const vegs = getVegForMonth(currentMonth);
+  vegs.forEach(veg => {
+    const chip = document.createElement('div');
+    chip.className = 'pantry-chip' + (pantrySelected.has(veg.name) ? ' selected' : '');
+    chip.textContent = `${veg.emoji} ${veg.name}`;
+    chip.addEventListener('click', () => {
+      if (pantrySelected.has(veg.name)) {
+        pantrySelected.delete(veg.name);
+        chip.classList.remove('selected');
+      } else {
+        pantrySelected.add(veg.name);
+        chip.classList.add('selected');
+      }
+      renderPantryResults();
+    });
+    chips.appendChild(chip);
+  });
+
+  renderPantryResults();
+  document.getElementById('pantryModal').classList.add('open');
+}
+
+function renderPantryResults() {
+  const results = document.getElementById('pantryResults');
+  results.innerHTML = '';
+
+  if (pantrySelected.size === 0) {
+    const msg = document.createElement('div');
+    msg.className = 'pantry-empty';
+    msg.textContent = 'Select some veg above to see what you can cook.';
+    results.appendChild(msg);
+    return;
+  }
+
+  const title = document.createElement('div');
+  title.className = 'pantry-results-title';
+  title.textContent = `Meal ideas with your ${pantrySelected.size} selected ingredient${pantrySelected.size > 1 ? 's' : ''}:`;
+  results.appendChild(title);
+
+  pantrySelected.forEach(vegName => {
+    const veg = VEG.find(v => v.name === vegName);
+    if (!veg) return;
+
+    const group = document.createElement('div');
+    group.className = 'pantry-veg-group';
+
+    const groupName = document.createElement('div');
+    groupName.className = 'pantry-veg-group-name';
+    groupName.textContent = `${veg.emoji} ${veg.name}`;
+    group.appendChild(groupName);
+
+    veg.meals.forEach(meal => {
+      const item = document.createElement('div');
+      item.className = 'meal-item';
+      item.innerHTML = `
+        <div class="meal-icon">${meal.icon}</div>
+        <div class="meal-content">
+          <div class="meal-name-row">
+            <span class="meal-name">${meal.name}</span>
+            <span class="difficulty-badge ${diffClass(meal.difficulty)}">${diffLabel(meal.difficulty)} · ${meal.time}</span>
+          </div>
+          <div class="meal-desc">${meal.desc}</div>
+        </div>
+      `;
+      group.appendChild(item);
+    });
+
+    results.appendChild(group);
+  });
+}
+
+
+
+// ═══════════════════════════════════════════════════════════
+// EVENT LISTENERS
+// ═══════════════════════════════════════════════════════════
+
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchQuery = e.target.value.trim();
+  renderVeg();
+});
+
+document.getElementById('plannerToggle').addEventListener('click', () => {
+  const wrap = document.getElementById('plannerWrap');
+  const open = wrap.classList.toggle('open');
+  document.getElementById('plannerToggle').textContent = open ? '📅 Meal Planner ▲' : '📅 Meal Planner';
+});
+
+document.getElementById('shoppingBtn').addEventListener('click', generateShoppingList);
+document.getElementById('clearPlannerBtn').addEventListener('click', () => {
+  DAYS.forEach(d => { planner[d] = []; });
+  renderPlanner();
+});
+
+document.getElementById('pantryBtn').addEventListener('click', openPantry);
+document.getElementById('pantryClose').addEventListener('click', () => {
+  document.getElementById('pantryModal').classList.remove('open');
+});
+document.getElementById('pantryModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) document.getElementById('pantryModal').classList.remove('open');
+});
+
+document.getElementById('shoppingClose').addEventListener('click', () => {
+  document.getElementById('shoppingModal').classList.remove('open');
+});
+document.getElementById('shoppingModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) document.getElementById('shoppingModal').classList.remove('open');
+});
+
+
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+
+buildMonthNav();
+applyTheme(currentMonth);
+updateHeader();
+renderVeg();
+renderPlanner();
+
+</script>
+</body>
+</html>
