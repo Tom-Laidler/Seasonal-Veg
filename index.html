@@ -287,31 +287,111 @@ header h1 em { color: var(--s-accent); font-style: italic; transition: color 0.6
 .btn-clear-planner { background: #eee; color: #666; }
 .btn-clear-planner:hover { background: #e0e0e0; }
 
-/* Day picker popover */
-.day-picker {
+/* Day picker — bottom sheet (works on mobile & desktop) */
+.day-picker-overlay {
   position: fixed;
-  z-index: 500;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 600;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.day-picker-sheet {
   background: white;
-  border: 1px solid var(--straw);
-  border-radius: 4px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-  padding: 0.5rem;
+  border-radius: 12px 12px 0 0;
+  padding: 1.2rem 1.2rem 2rem;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.15);
+  max-height: 85vh;
+  overflow-y: auto;
+}
+.day-picker-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  color: var(--bark);
+  margin-bottom: 0.3rem;
+}
+.day-picker-sub {
+  font-size: 0.78rem;
+  color: var(--sage);
+  margin-bottom: 1rem;
+}
+/* Meal selector list */
+.meal-pick-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+.meal-pick-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: var(--cream);
+  border: 1.5px solid var(--straw);
+  border-radius: 8px;
+  padding: 0.75rem 0.9rem;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background 0.15s, border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.meal-pick-btn:hover,
+.meal-pick-btn:active { background: #e8f0e5; border-color: var(--moss); }
+.meal-pick-icon { font-size: 1.5rem; flex-shrink: 0; }
+.meal-pick-info { flex: 1; min-width: 0; }
+.meal-pick-name { font-size: 0.88rem; font-weight: 700; color: var(--bark); margin-bottom: 0.1rem; }
+.meal-pick-meta { font-size: 0.72rem; color: var(--sage); }
+/* Day grid */
+.day-picker-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 0.3rem;
-  min-width: 200px;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
 }
-.day-picker button {
-  background: var(--s-bg);
-  border: 1px solid var(--straw);
-  border-radius: 2px;
+.day-picker-grid button {
+  background: var(--cream);
+  border: 1.5px solid var(--straw);
+  border-radius: 6px;
   font-family: 'Lato', sans-serif;
-  font-size: 0.7rem;
-  padding: 0.4rem 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.7rem 0.3rem;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, border-color 0.15s;
+  color: var(--bark);
+  -webkit-tap-highlight-color: transparent;
 }
-.day-picker button:hover { background: var(--moss); color: white; }
+.day-picker-grid button:hover,
+.day-picker-grid button:active { background: var(--moss); border-color: var(--moss); color: white; }
+.day-picker-back {
+  background: none;
+  border: none;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.75rem;
+  color: var(--moss);
+  cursor: pointer;
+  padding: 0 0 0.8rem;
+  display: block;
+  -webkit-tap-highlight-color: transparent;
+}
+.day-picker-back:hover { text-decoration: underline; }
+.day-picker-cancel {
+  width: 100%;
+  background: #f0ebe0;
+  border: none;
+  border-radius: 6px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.8rem;
+  padding: 0.7rem;
+  cursor: pointer;
+  color: var(--sage);
+  -webkit-tap-highlight-color: transparent;
+}
+.day-picker-cancel:hover { background: #e8e0d0; }
 
 /* ═══════════════════════════════════════════════════════════
    MAIN CONTAINER
@@ -1205,7 +1285,7 @@ let currentMonth = (!isNaN(savedMonth) && savedMonth >= 0 && savedMonth <= 11)
 
 let searchQuery = '';
 
-// Planner: { Mon: [{name, emoji},...], ... }
+// Planner: { Mon: [{mealName, mealIcon, vegName},...], ... }
 const planner = {};
 DAYS.forEach(d => { planner[d] = []; });
 
@@ -1407,7 +1487,7 @@ function buildVegCard(veg) {
   planBtn.className = 'add-plan-btn';
   planBtn.textContent = '📅 Add to Plan';
   planBtn.title = 'Add to Meal Planner';
-  planBtn.addEventListener('click', e => { e.stopPropagation(); showDayPicker(veg, planBtn); });
+  planBtn.addEventListener('click', e => { e.stopPropagation(); showDayPicker(veg); });
   banner.appendChild(planBtn);
 
   // ── Body ──
@@ -1522,14 +1602,14 @@ function renderPlanner() {
       planner[day].forEach(item => {
         const row = document.createElement('div');
         row.className = 'planner-veg-item';
-        row.textContent = `${item.emoji} ${item.name}`;
+        row.textContent = `${item.mealIcon} ${item.mealName}`;
 
         const removeBtn = document.createElement('button');
         removeBtn.className = 'planner-veg-remove';
         removeBtn.textContent = '×';
         removeBtn.title = 'Remove';
         removeBtn.addEventListener('click', () => {
-          planner[day] = planner[day].filter(i => i.name !== item.name);
+          planner[day] = planner[day].filter(i => i.mealName !== item.mealName);
           renderPlanner();
         });
         row.appendChild(removeBtn);
@@ -1540,55 +1620,122 @@ function renderPlanner() {
   });
 }
 
-function showDayPicker(veg, anchor) {
-  // Remove any existing picker
-  document.querySelectorAll('.day-picker').forEach(el => el.remove());
+function showDayPicker(veg) {
+  document.querySelectorAll('.day-picker-overlay').forEach(el => el.remove());
 
-  const picker = document.createElement('div');
-  picker.className = 'day-picker';
+  const overlay = document.createElement('div');
+  overlay.className = 'day-picker-overlay';
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+
+  const sheet = document.createElement('div');
+  sheet.className = 'day-picker-sheet';
+  overlay.appendChild(sheet);
+  document.body.appendChild(overlay);
+
+  showMealStep(veg, sheet, overlay);
+}
+
+function showMealStep(veg, sheet, overlay) {
+  sheet.innerHTML = '';
+
+  const title = document.createElement('div');
+  title.className = 'day-picker-title';
+  title.textContent = `${veg.emoji} ${veg.name}`;
+
+  const sub = document.createElement('div');
+  sub.className = 'day-picker-sub';
+  sub.textContent = 'Which meal would you like to plan?';
+
+  const list = document.createElement('div');
+  list.className = 'meal-pick-list';
+
+  veg.meals.forEach(meal => {
+    const btn = document.createElement('button');
+    btn.className = 'meal-pick-btn';
+    btn.innerHTML = `
+      <span class="meal-pick-icon">${meal.icon}</span>
+      <span class="meal-pick-info">
+        <span class="meal-pick-name">${meal.name}</span>
+        <span class="meal-pick-meta">${diffLabel(meal.difficulty)} · ${meal.time}</span>
+      </span>
+    `;
+    btn.addEventListener('click', () => showDayStep(veg, meal, sheet, overlay));
+    list.appendChild(btn);
+  });
+
+  const cancel = document.createElement('button');
+  cancel.className = 'day-picker-cancel';
+  cancel.textContent = 'Cancel';
+  cancel.addEventListener('click', () => overlay.remove());
+
+  sheet.appendChild(title);
+  sheet.appendChild(sub);
+  sheet.appendChild(list);
+  sheet.appendChild(cancel);
+}
+
+function showDayStep(veg, meal, sheet, overlay) {
+  sheet.innerHTML = '';
+
+  const back = document.createElement('button');
+  back.className = 'day-picker-back';
+  back.textContent = '← Back to meals';
+  back.addEventListener('click', () => showMealStep(veg, sheet, overlay));
+
+  const title = document.createElement('div');
+  title.className = 'day-picker-title';
+  title.textContent = `${meal.icon} ${meal.name}`;
+
+  const sub = document.createElement('div');
+  sub.className = 'day-picker-sub';
+  sub.textContent = 'Which day would you like to cook this?';
+
+  const grid = document.createElement('div');
+  grid.className = 'day-picker-grid';
 
   DAYS.forEach(day => {
     const btn = document.createElement('button');
     btn.textContent = day;
+    const alreadyAdded = planner[day].some(i => i.mealName === meal.name);
+    if (alreadyAdded) btn.style.opacity = '0.4';
     btn.addEventListener('click', e => {
       e.stopPropagation();
-      const already = planner[day].some(i => i.name === veg.name);
-      if (!already) {
-        planner[day].push({ name: veg.name, emoji: veg.emoji });
+      if (!alreadyAdded) {
+        planner[day].push({ mealName: meal.name, mealIcon: meal.icon, vegName: veg.name });
         renderPlanner();
       }
-      picker.remove();
-      // Open planner so user sees the result
+      overlay.remove();
       const wrap = document.getElementById('plannerWrap');
       wrap.classList.add('open');
       document.getElementById('plannerToggle').textContent = '📅 Meal Planner ▲';
     });
-    picker.appendChild(btn);
+    grid.appendChild(btn);
   });
 
-  // Position
-  const rect = anchor.getBoundingClientRect();
-  picker.style.top  = (rect.bottom + window.scrollY + 4) + 'px';
-  picker.style.left = Math.min(rect.left, window.innerWidth - 220) + 'px';
-  document.body.appendChild(picker);
+  const cancel = document.createElement('button');
+  cancel.className = 'day-picker-cancel';
+  cancel.textContent = 'Cancel';
+  cancel.addEventListener('click', () => overlay.remove());
 
-  setTimeout(() => {
-    document.addEventListener('click', () => picker.remove(), { once: true });
-  }, 10);
+  sheet.appendChild(back);
+  sheet.appendChild(title);
+  sheet.appendChild(sub);
+  sheet.appendChild(grid);
+  sheet.appendChild(cancel);
 }
 
 function generateShoppingList() {
   const allVeg = new Set();
-  DAYS.forEach(day => planner[day].forEach(item => allVeg.add(item.name)));
+  DAYS.forEach(day => planner[day].forEach(item => allVeg.add(item.vegName)));
 
   const list = document.getElementById('shoppingList');
   const sub  = document.getElementById('shoppingSubtitle');
   list.innerHTML = '';
 
   if (allVeg.size === 0) {
-    sub.textContent = 'Your planner is empty — add some veg first!';
+    sub.textContent = 'Your planner is empty — add some meals first!';
   } else {
-    sub.textContent = `${allVeg.size} seasonal ingredient${allVeg.size > 1 ? 's' : ''} for your week.`;
+    sub.textContent = `${allVeg.size} seasonal ingredient${allVeg.size > 1 ? 's' : ''} needed for your week.`;
     allVeg.forEach(name => {
       const veg = VEG.find(v => v.name === name);
       const li = document.createElement('li');
